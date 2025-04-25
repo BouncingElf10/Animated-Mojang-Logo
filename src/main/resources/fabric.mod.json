@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "animated-logo",
+  "version": "1.3",
+  "name": "Animated Mojang Logo",
+  "authors": [
+    "Cyao (cheyao)"
+  ],
+  "contact": {
+    "homepage": "https://github.com/cheyao/animated-logo",
+    "sources": "https://github.com/cheyao/animated-logo"
+  },
+  "license": "ZLIB",
+  "icon": "assets/animated-logo/icon.png",
+ "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.cyao.animatedLogo.AnimatedLogo"
+    ]
+  },
+  "mixins": [
+    "animated-logo.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.5",
+    "minecraft": ">=1.21.2",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "accessWidener" : "animated-logo.accesswidener"
+}

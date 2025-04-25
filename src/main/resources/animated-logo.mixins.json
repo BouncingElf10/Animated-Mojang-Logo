@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.cyao.animatedLogo.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "SplashOverlayMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,7 @@
+accessWidener v2 named
+accessible method net/minecraft/client/MinecraftClient handleResourceReloadException (Ljava/lang/Throwable;Lnet/minecraft/client/MinecraftClient$LoadingContext;)V
+accessible method net/minecraft/client/MinecraftClient checkGameData ()V
+accessible method net/minecraft/client/MinecraftClient onFinishedLoading (Lnet/minecraft/client/MinecraftClient$LoadingContext;)V
+accessible field net/minecraft/client/MinecraftClient resourceReloadLogger Lnet/minecraft/client/resource/ResourceReloadLogger;
+accessible field net/minecraft/client/MinecraftClient resourceManager Lnet/minecraft/resource/ReloadableResourceManagerImpl;
+accessible field net/minecraft/client/MinecraftClient COMPLETED_UNIT_FUTURE Ljava/util/concurrent/CompletableFuture;
