@@ -1,27 +1,34 @@
 package com.cyao.animatedLogo.mixin;
 
+import com.cyao.animatedLogo.AnimatedLogo;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.resource.ResourceReload;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
 @Mixin(SplashOverlay.class)
 public class SplashOverlayMixin {
+    @Mutable
     @Shadow @Final private ResourceReload reload;
     @Shadow private float progress;
 
+    @Unique private static final float ANIMATION_SPEED = 0.5f;
+    @Unique private float animationTick = 0.0f;
     @Unique private int count = 0;
     @Unique private Identifier[] frames;
     @Unique private boolean inited = false;
@@ -31,6 +38,17 @@ public class SplashOverlayMixin {
     @Unique private float f = 0;
     @Unique private boolean animationDone = false;
     @Unique private static final int MOJANG_RED = ColorHelper.getArgb(255, 239, 50, 61);
+
+    @Unique private long animationDelayStartTime = -1;
+    @Unique private static final long ANIMATION_DELAY_MS = 2000;
+
+    @Unique private boolean soundPlayed = false;
+
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(MinecraftClient client, ResourceReload monitor, Consumer<Throwable> exceptionHandler, boolean reloading, CallbackInfo ci) {
+        animationDelayStartTime = System.currentTimeMillis();
+    }
 
     @ModifyArg(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", ordinal = 0),
@@ -48,13 +66,33 @@ public class SplashOverlayMixin {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        long elapsed = System.currentTimeMillis() - animationDelayStartTime;
+
+        // Don't render animation until delay has passed
+        if (elapsed < ANIMATION_DELAY_MS) {
+            // optionally, just draw the background red during the wait
+            context.fill(RenderLayer.getGuiOverlay(), 0, 0,
+                    context.getScaledWindowWidth(), context.getScaledWindowHeight(),
+                    MOJANG_RED);
+            ci.cancel();
+            return;
+        }
+
         if (!animationDone) {
             drawAnimatedIntro(context, mouseX, mouseY, delta);
             ci.cancel();
         }
     }
 
+    @Unique
     private void drawAnimatedIntro(DrawContext context, int mouseX, int mouseY, float delta) {
+        if (!soundPlayed) {
+            MinecraftClient.getInstance().getSoundManager().play(
+                    PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
+            );
+            soundPlayed = true;
+        }
+
         if (!inited) {
             this.frames = new Identifier[FRAMES];
             for (int i = 0; i < FRAMES; i++) {
@@ -81,9 +119,11 @@ public class SplashOverlayMixin {
                 0, subFrameY, width, height,
                 1024, 256, 1024, 1024, ColorHelper.getWhite(1.0f));
 
-        count++;
-        if (count >= FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME) {
+        animationTick += ANIMATION_SPEED;
+        count = (int) animationTick;
+        if (animationTick >= FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME) {
             animationDone = true;
+            count = FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME - 1; // Force last frame
         }
     }
 
