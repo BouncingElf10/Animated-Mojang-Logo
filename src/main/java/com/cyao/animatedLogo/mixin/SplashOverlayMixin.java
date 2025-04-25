@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.resource.ResourceReload;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
@@ -18,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @Mixin(SplashOverlay.class)
@@ -79,13 +77,13 @@ public class SplashOverlayMixin {
         }
 
         if (!animationDone) {
-            drawAnimatedIntro(context, mouseX, mouseY, delta);
+            drawAnimatedIntro(context);
             ci.cancel();
         }
     }
 
     @Unique
-    private void drawAnimatedIntro(DrawContext context, int mouseX, int mouseY, float delta) {
+    private void drawAnimatedIntro(DrawContext context) {
         if (!soundPlayed) {
             MinecraftClient.getInstance().getSoundManager().play(
                     PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
@@ -158,7 +156,7 @@ public class SplashOverlayMixin {
 
         Identifier finalFrame = frames[FRAMES - 1];
         context.drawTexture(RenderLayer::getGuiTextured, finalFrame, finalFrameX, finalFrameY,
-                0, finalSubFrameY, (int) finalFrameWidth, (int) finalFrameHeight,
+                0, finalSubFrameY, finalFrameWidth, finalFrameHeight,
                 1024, 256, 1024, 1024, ColorHelper.getWhite(alpha));
     }
 }
