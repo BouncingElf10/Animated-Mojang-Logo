@@ -2,12 +2,16 @@ package com.cyao.animatedLogo.mixin;
 
 import com.cyao.animatedLogo.AnimatedLogo;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.FontStorage;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.*;
 import net.minecraft.resource.ResourceReload;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
@@ -43,6 +47,7 @@ public class SplashOverlayMixin {
     @Unique private static final long ANIMATION_DELAY_MS = 1;
 
     @Unique private boolean soundPlayed = false;
+    @Unique private boolean animationReady = false;
 
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -72,22 +77,38 @@ public class SplashOverlayMixin {
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
                     ColorHelper.withAlpha((int)((elapsed * 255) / ANIMATION_DELAY_MS / 10), MOJANG_RED));
-
             ci.cancel();
             return;
         }
 
         if (!animationDone) {
-            drawAnimatedIntro(context);
+            drawAnimatedIntro(context, delta);
             ci.cancel();
         }
     }
-    //play after sound manager iniut
+
     //make frame indepentendt
     @Unique
-    private void drawAnimatedIntro(DrawContext context) {
+    private void drawAnimatedIntro(DrawContext context, float delta) {
+        if (!animationReady && reload.isComplete()) {
+            animationReady = true;
+        }
+
+        // wait until resources are fully loaded
+        if (!animationReady) {
+            context.fill(RenderLayer.getGuiOverlay(), 0, 0,
+                    context.getScaledWindowWidth(), context.getScaledWindowHeight(),
+                    MOJANG_RED);
+
+            context.drawTexture(RenderLayer::getGuiTextured, Identifier.of("animated-logo", "loading.png"),
+                    7, context.getScaledWindowHeight() - 8 - 7,0, 0,100, 8, 100, 8, ColorHelper.getWhite(1.0f));
+
+            context.drawTexture(RenderLayer::getGuiTextured, Identifier.of("animated-logo", "loadingw.png"),
+                    8, context.getScaledWindowHeight() - 8 - 8,0, 0,100, 8, 100, 8, ColorHelper.getWhite(1.0f));
+            return;
+        }
+
         if (!soundPlayed) {
-            LOGGER.info("herhe");
             MinecraftClient.getInstance().getSoundManager().play(
                     PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
             );
@@ -120,6 +141,7 @@ public class SplashOverlayMixin {
         context.drawTexture(RenderLayer::getGuiTextured, frames[frameIndex], x, y,
                 0, subFrameY, width, height,
                 1024, 256, 1024, 1024, ColorHelper.getWhite(1.0f));
+
 
         animationTick += ANIMATION_SPEED;
         count = (int) animationTick;
