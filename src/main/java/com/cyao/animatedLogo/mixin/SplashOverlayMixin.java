@@ -6,7 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.sound.*;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Consumer;
+
+import static com.cyao.animatedLogo.AnimatedLogo.LOGGER;
 
 @Mixin(SplashOverlay.class)
 public class SplashOverlayMixin {
@@ -38,7 +40,7 @@ public class SplashOverlayMixin {
     @Unique private static final int MOJANG_RED = ColorHelper.getArgb(255, 239, 50, 61);
 
     @Unique private long animationDelayStartTime = -1;
-    @Unique private static final long ANIMATION_DELAY_MS = 2000;
+    @Unique private static final long ANIMATION_DELAY_MS = 1;
 
     @Unique private boolean soundPlayed = false;
 
@@ -66,12 +68,11 @@ public class SplashOverlayMixin {
     private void preRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         long elapsed = System.currentTimeMillis() - animationDelayStartTime;
 
-        // Don't render animation until delay has passed
         if (elapsed < ANIMATION_DELAY_MS) {
-            // optionally, just draw the background red during the wait
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
-                    MOJANG_RED);
+                    ColorHelper.withAlpha((int)((elapsed * 255) / ANIMATION_DELAY_MS / 10), MOJANG_RED));
+
             ci.cancel();
             return;
         }
@@ -81,13 +82,16 @@ public class SplashOverlayMixin {
             ci.cancel();
         }
     }
-
+    //play after sound manager iniut
+    //make frame indepentendt
     @Unique
     private void drawAnimatedIntro(DrawContext context) {
         if (!soundPlayed) {
+            LOGGER.info("herhe");
             MinecraftClient.getInstance().getSoundManager().play(
                     PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
             );
+            LOGGER.info("Playing startup sound");
             soundPlayed = true;
         }
 
@@ -121,7 +125,7 @@ public class SplashOverlayMixin {
         count = (int) animationTick;
         if (animationTick >= FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME) {
             animationDone = true;
-            count = FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME - 1; // Force last frame
+            count = FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME - 1;
         }
     }
 
