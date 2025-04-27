@@ -1,5 +1,7 @@
-# Animated minecraft logo
+# Animated Minecraft Logo
 
-This minecraft plugin animates the minecraft logo, using the animation from Minecraft Dungeons.
+This mod aims to replace the old boring Minecraft loading screen with the nice animation from Minecraft Dungeons / MC Live with the accopanying jingle.
 
-Original idea is from [here](https://www.curseforge.com/minecraft/mc-mods/animated-splash-screen) but I rewrote it entirely to work with fabric and 1.21.1
+https://github.com/user-attachments/assets/7c2e76dc-1609-4272-a6e6-bef3327edda5
+
+This project uses assets (textures, code) kindly credited to Cheyao, the original creator of the mod [Animated Loading Screen](https://modrinth.com/mod/animated-loading-screen).
