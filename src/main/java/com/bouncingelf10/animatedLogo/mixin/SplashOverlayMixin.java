@@ -1,6 +1,6 @@
-package com.cyao.animatedLogo.mixin;
+package com.bouncingelf10.animatedLogo.mixin;
 
-import com.cyao.animatedLogo.AnimatedLogo;
+import com.bouncingelf10.animatedLogo.AnimatedLogo;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Consumer;
 
-import static com.cyao.animatedLogo.AnimatedLogo.LOGGER;
+import static com.bouncingelf10.animatedLogo.AnimatedLogo.LOGGER;
 
 @Mixin(SplashOverlay.class)
 public class SplashOverlayMixin {
@@ -48,6 +48,7 @@ public class SplashOverlayMixin {
     @Unique private static final long ANIMATION_DELAY_MS = 1;
     @Unique private long fadeOutStartTime = -1;
     @Unique private static final long FADE_OUT_DURATION_MS = 1000; // in milliseconds
+    @Unique private static float loadingBarProgress = 0.0f; // in seconds
 
     // Draw vanilla loading bar
     // Copied from: net.minecraft.client.gui.screen.SplashOverlay.renderProgressBar
@@ -133,7 +134,8 @@ public class SplashOverlayMixin {
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
                     MOJANG_RED);
 
-            drawLoadingBar(context, 1.0f, reload.getProgress());
+            drawLoadingBar(context, 1.0f, Math.max(loadingBarProgress, reload.getProgress()));
+            loadingBarProgress = reload.getProgress();
 
             return;
         }
@@ -146,12 +148,13 @@ public class SplashOverlayMixin {
         if (isFadingOut && !isFadingFinished) {
             long elapsedFade = System.currentTimeMillis() - fadeOutStartTime;
             float fadeFactor = 1.0f - MathHelper.clamp((float)elapsedFade / FADE_OUT_DURATION_MS, 0.0f, 1.0f);
-            LOGGER.info(String.valueOf(fadeFactor));
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
                     MOJANG_RED);
 
-            drawLoadingBar(context, fadeFactor, reload.getProgress());
+            drawLoadingBar(context, fadeFactor, Math.max(loadingBarProgress, reload.getProgress()));
+            loadingBarProgress = reload.getProgress();
+
 
             if (fadeFactor <= 0.0) {
                 isFadingFinished = true;

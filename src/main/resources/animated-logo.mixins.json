@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.cyao.animatedLogo.mixin",
+  "package": "com.bouncingelf10.animatedLogo.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "SplashOverlayMixin"

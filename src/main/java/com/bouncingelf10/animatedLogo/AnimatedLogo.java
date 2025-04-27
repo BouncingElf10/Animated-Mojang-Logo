@@ -1,4 +1,4 @@
-package com.cyao.animatedLogo;
+package com.bouncingelf10.animatedLogo;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.registry.Registries;
@@ -13,7 +13,6 @@ public class AnimatedLogo implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static final Identifier STARTUP_SOUND_ID = Identifier.of("animated-logo", "startup");
-
     public static final SoundEvent STARTUP_SOUND_EVENT = SoundEvent.of(STARTUP_SOUND_ID);
 
     @Override
