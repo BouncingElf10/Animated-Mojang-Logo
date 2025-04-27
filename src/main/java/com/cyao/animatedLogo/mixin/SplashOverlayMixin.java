@@ -2,16 +2,12 @@ package com.cyao.animatedLogo.mixin;
 
 import com.cyao.animatedLogo.AnimatedLogo;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.FontStorage;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.*;
 import net.minecraft.resource.ResourceReload;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
@@ -31,8 +27,6 @@ public class SplashOverlayMixin {
     @Shadow @Final private ResourceReload reload;
     @Shadow private float progress;
 
-    @Unique private static final float ANIMATION_SPEED = 0.5f;
-    @Unique private float animationTick = 0.0f;
     @Unique private int count = 0;
     @Unique private Identifier[] frames;
     @Unique private boolean inited = false;
@@ -43,31 +37,75 @@ public class SplashOverlayMixin {
     @Unique private boolean animationDone = false;
     @Unique private static final int MOJANG_RED = ColorHelper.getArgb(255, 239, 50, 61);
 
-    @Unique private long animationDelayStartTime = -1;
-    @Unique private static final long ANIMATION_DELAY_MS = 1;
-
     @Unique private boolean soundPlayed = false;
     @Unique private boolean animationReady = false;
+    @Unique private boolean isFadingOut = false;
+    @Unique private boolean isFadingFinished = false;
 
+    @Unique private long animationStartTime = -1;
+    @Unique private static final float TOTAL_ANIMATION_DURATION = 3.0f; // in seconds
+    @Unique private long animationDelayStartTime = -1;
+    @Unique private static final long ANIMATION_DELAY_MS = 1;
+    @Unique private long fadeOutStartTime = -1;
+    @Unique private static final long FADE_OUT_DURATION_MS = 1000; // in milliseconds
+
+    // Draw vanilla loading bar
+    // Copied from: net.minecraft.client.gui.screen.SplashOverlay.renderProgressBar
+    @Unique
+    private void drawLoadingBar(DrawContext context, float opacity, float progress) {
+        int screenWidth = context.getScaledWindowWidth();
+        int screenHeight = context.getScaledWindowHeight();
+
+        int centerX = screenWidth / 2;
+        int progressBarY = (int)(screenHeight * 0.8325);
+
+        double logoHeight = Math.min(screenWidth * 0.75, screenHeight) * 0.25;
+        double logoWidth = logoHeight * 4.0;
+        int halfLogoWidth = (int)(logoWidth * 0.5);
+
+        int minX = centerX - halfLogoWidth;
+        int maxX = centerX + halfLogoWidth;
+        int minY = progressBarY - 5;
+        int maxY = progressBarY + 5;
+
+        int filled = MathHelper.ceil((float)(maxX - minX - 2) * progress);
+        int alpha = Math.round(opacity * 255.0F);
+        int color = ColorHelper.getArgb(alpha, 255, 255, 255);
+
+        context.fill(minX + 2, minY + 2, minX + filled, maxY - 2, color);
+        context.fill(minX + 1, minY, maxX - 1, minY + 1, color);
+        context.fill(minX + 1, maxY, maxX - 1, maxY - 1, color);
+        context.fill(minX, minY, minX + 1, maxY, color);
+        context.fill(maxX, minY, maxX - 1, maxY, color);
+    }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(MinecraftClient client, ResourceReload monitor, Consumer<Throwable> exceptionHandler, boolean reloading, CallbackInfo ci) {
         animationDelayStartTime = System.currentTimeMillis();
     }
 
+    // Stop rendering of title
     @ModifyArg(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", ordinal = 0),
             index = 7)
     private int removeText1(int i) {
         return 0;
     }
-
     @ModifyArg(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", ordinal = 1),
             index = 7)
     private int removeText2(int u) {
         return 0;
     }
+
+    // Stop rendering of loading bar
+    @ModifyArg(method = "render",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SplashOverlay;renderProgressBar(Lnet/minecraft/client/gui/DrawContext;IIIIF)V", ordinal = 0),
+            index = 5)
+    private float removeBar(float opacity) {
+        return 0.0f;
+    }
+
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -82,72 +120,96 @@ public class SplashOverlayMixin {
         }
 
         if (!animationDone) {
-            drawAnimatedIntro(context, delta);
+            drawAnimatedIntro(context);
             ci.cancel();
         }
     }
 
-    //make frame indepentendt
     @Unique
-    private void drawAnimatedIntro(DrawContext context, float delta) {
-        if (!animationReady && reload.isComplete()) {
-            animationReady = true;
-        }
+    private void drawAnimatedIntro(DrawContext context) {
+        if (!reload.isComplete() && !isFadingOut && !isFadingFinished) {
 
-        // wait until resources are fully loaded
-        if (!animationReady) {
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
                     MOJANG_RED);
 
-            context.drawTexture(RenderLayer::getGuiTextured, Identifier.of("animated-logo", "loading.png"),
-                    7, context.getScaledWindowHeight() - 8 - 7,0, 0,100, 8, 100, 8, ColorHelper.getWhite(1.0f));
+            drawLoadingBar(context, 1.0f, reload.getProgress());
 
-            context.drawTexture(RenderLayer::getGuiTextured, Identifier.of("animated-logo", "loadingw.png"),
-                    8, context.getScaledWindowHeight() - 8 - 8,0, 0,100, 8, 100, 8, ColorHelper.getWhite(1.0f));
             return;
         }
 
-        if (!soundPlayed) {
-            MinecraftClient.getInstance().getSoundManager().play(
-                    PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
-            );
-            LOGGER.info("Playing startup sound");
-            soundPlayed = true;
+        if (reload.isComplete() && !isFadingOut && !isFadingFinished) {
+            isFadingOut = true;
+            fadeOutStartTime = System.currentTimeMillis();
         }
 
-        if (!inited) {
-            this.frames = new Identifier[FRAMES];
-            for (int i = 0; i < FRAMES; i++) {
-                this.frames[i] = Identifier.of("animated-logo", "textures/gui/frame_" + i + ".png");
+        if (isFadingOut && !isFadingFinished) {
+            long elapsedFade = System.currentTimeMillis() - fadeOutStartTime;
+            float fadeFactor = 1.0f - MathHelper.clamp((float)elapsedFade / FADE_OUT_DURATION_MS, 0.0f, 1.0f);
+            LOGGER.info(String.valueOf(fadeFactor));
+            context.fill(RenderLayer.getGuiOverlay(), 0, 0,
+                    context.getScaledWindowWidth(), context.getScaledWindowHeight(),
+                    MOJANG_RED);
+
+            drawLoadingBar(context, fadeFactor, reload.getProgress());
+
+            if (fadeFactor <= 0.0) {
+                isFadingFinished = true;
             }
-            inited = true;
+
+            return;
         }
 
-        int screenWidth = context.getScaledWindowWidth();
-        int screenHeight = context.getScaledWindowHeight();
-        int width = screenWidth / 2;
-        int height = width * 256 / 1024;
-        int x = (screenWidth - width) / 2;
-        int y = (screenHeight - height) / 2;
+        if (isFadingFinished && !animationReady) {
+            animationReady = true;
+            animationStartTime = System.nanoTime();
 
-        int frameIndex = count / IMAGE_PER_FRAME / FRAMES_PER_FRAME;
-        int subFrameY = 256 * ((count % (IMAGE_PER_FRAME * FRAMES_PER_FRAME)) / FRAMES_PER_FRAME);
+            if (!soundPlayed) {
+                MinecraftClient.getInstance().getSoundManager().play(
+                        PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
+                );
+                LOGGER.info("Playing startup sound");
+                soundPlayed = true;
+            }
 
-        context.fill(RenderLayer.getGuiOverlay(), 0, 0,
-                context.getScaledWindowWidth(), context.getScaledWindowHeight(),
-                MOJANG_RED);
+            if (!inited) {
+                this.frames = new Identifier[FRAMES];
+                for (int i = 0; i < FRAMES; i++) {
+                    this.frames[i] = Identifier.of("animated-logo", "textures/gui/frame_" + i + ".png");
+                }
+                inited = true;
+            }
+        }
 
-        context.drawTexture(RenderLayer::getGuiTextured, frames[frameIndex], x, y,
-                0, subFrameY, width, height,
-                1024, 256, 1024, 1024, ColorHelper.getWhite(1.0f));
+        if (animationReady) {
+            double elapsedSeconds = (System.nanoTime() - animationStartTime) / 1_000_000_000.0;
+            double animationProgress = Math.min(elapsedSeconds / TOTAL_ANIMATION_DURATION, 1.0);
 
+            int totalFrameCount = FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME;
+            count = (int)(animationProgress * totalFrameCount);
 
-        animationTick += ANIMATION_SPEED;
-        count = (int) animationTick;
-        if (animationTick >= FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME) {
-            animationDone = true;
-            count = FRAMES * IMAGE_PER_FRAME * FRAMES_PER_FRAME - 1;
+            if (animationProgress >= 1.0) {
+                animationDone = true;
+                count = totalFrameCount - 1;
+            }
+
+            int screenWidth = context.getScaledWindowWidth();
+            int screenHeight = context.getScaledWindowHeight();
+            int width = screenWidth / 2;
+            int height = width * 256 / 1024;
+            int x = (screenWidth - width) / 2;
+            int y = (screenHeight - height) / 2;
+
+            int frameIndex = count / IMAGE_PER_FRAME / FRAMES_PER_FRAME;
+            int subFrameY = 256 * ((count % (IMAGE_PER_FRAME * FRAMES_PER_FRAME)) / FRAMES_PER_FRAME);
+
+            context.fill(RenderLayer.getGuiOverlay(), 0, 0,
+                    context.getScaledWindowWidth(), context.getScaledWindowHeight(),
+                    MOJANG_RED);
+
+            context.drawTexture(RenderLayer::getGuiTextured, frames[frameIndex], x, y,
+                    0, subFrameY, width, height,
+                    1024, 256, 1024, 1024, ColorHelper.getWhite(1.0f));
         }
     }
 
