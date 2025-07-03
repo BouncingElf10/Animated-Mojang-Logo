@@ -1,8 +1,8 @@
 package com.bouncingelf10.animatedLogo.mixin;
 
 import com.bouncingelf10.animatedLogo.AnimatedLogo;
+import com.bouncingelf10.animatedLogo.DarkLoadingScreenCompat;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
@@ -17,8 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import io.github.a5b84.darkloadingscreen.config.Config;
-
 
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
@@ -43,27 +41,20 @@ public class SplashOverlayMixin {
     @Shadow
     @Final
     private static IntSupplier BRAND_ARGB; // Color of background
+    @Unique
     private static int whiteARGB = ColorHelper.getArgb(255, 255, 255, 255);
 
     @Unique
-    private static Boolean darkLoadingScreen = FabricLoader.getInstance().isModLoaded("dark-loading-screen");
+    private static IntSupplier LOADING_FILL = () ->
+            applyAlphaToColor(DarkLoadingScreenCompat.getBarColor(whiteARGB), 1.0f);
+    @Unique
+    private static IntSupplier LOADING_BORDER = () ->
+            applyAlphaToColor(DarkLoadingScreenCompat.getBorderColor(whiteARGB), 1.0f);
 
     @Unique
-    private static IntSupplier LOADING_FILL = () ->
-            darkLoadingScreen ?
-                    applyAlphaToColor(Config.read().bar, 1.0f) :
-                    whiteARGB;
-    @Unique         // Color of loading bar fill
-    private static IntSupplier LOADING_BORDER = () ->
-            darkLoadingScreen ?
-                    applyAlphaToColor(Config.read().border, 1.0f) :
-                    whiteARGB;
-    @Unique         // Color of loading bar border
     private static IntSupplier TEXT_COLOR = () ->
-            darkLoadingScreen ?
-                    applyAlphaToColor(Config.read().logo, 1.0f) :
-                    whiteARGB;
-                    // Color of text
+            applyAlphaToColor(DarkLoadingScreenCompat.getLogoColor(whiteARGB), 1.0f);
+
 
     @Unique private boolean soundPlayed = false;
     @Unique private boolean animationReady = false;
