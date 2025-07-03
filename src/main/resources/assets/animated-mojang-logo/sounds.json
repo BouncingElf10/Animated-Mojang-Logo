@@ -1,7 +1,7 @@
 {
   "startup": {
     "sounds": [
-      "animated-logo:startup"
+      "animated-mojang-logo:startup"
     ]
   }
 }
