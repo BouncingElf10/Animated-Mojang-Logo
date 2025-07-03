@@ -8,6 +8,8 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.bouncingelf10.animatedLogo.DarkLoadingScreenCompat.isDarkLoadingScreenNotPresent;
+
 public class AnimatedLogo implements ModInitializer {
     public static final String MOD_ID = "assets/animated-logo";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -17,7 +19,7 @@ public class AnimatedLogo implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("Initializing Startup Animation");
+        LOGGER.info("[Animated Mojang Logo] Initializing Startup Animation, DLS: {}", !isDarkLoadingScreenNotPresent());
         Registry.register(Registries.SOUND_EVENT, STARTUP_SOUND_ID, STARTUP_SOUND_EVENT);
     }
 }

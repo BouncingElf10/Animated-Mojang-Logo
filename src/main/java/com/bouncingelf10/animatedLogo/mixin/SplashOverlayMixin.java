@@ -89,7 +89,6 @@ public class SplashOverlayMixin {
         int maxY = progressBarY + 5;
 
         int filled = MathHelper.ceil((float)(maxX - minX - 2) * progress);
-        int alpha = Math.round(opacity * 255.0F);
         int colorFilled = LOADING_FILL.getAsInt();
         int colorOutline = LOADING_BORDER.getAsInt();
 
@@ -192,7 +191,7 @@ public class SplashOverlayMixin {
                 MinecraftClient.getInstance().getSoundManager().play(
                         PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
                 );
-                LOGGER.info("Playing startup sound");
+                LOGGER.info("[Animated Mojang Logo] Playing startup sound");
                 soundPlayed = true;
             }
 
