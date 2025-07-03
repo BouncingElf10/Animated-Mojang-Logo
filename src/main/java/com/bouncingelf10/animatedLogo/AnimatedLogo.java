@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory;
 import static com.bouncingelf10.animatedLogo.DarkLoadingScreenCompat.isDarkLoadingScreenNotPresent;
 
 public class AnimatedLogo implements ModInitializer {
-    public static final String MOD_ID = "assets/animated-logo";
+    public static final String MOD_ID = "animated-mojang-logo";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final Identifier STARTUP_SOUND_ID = Identifier.of("animated-logo", "startup");
+    public static final Identifier STARTUP_SOUND_ID = Identifier.of("animated-mojang-logo", "startup");
     public static final SoundEvent STARTUP_SOUND_EVENT = SoundEvent.of(STARTUP_SOUND_ID);
 
     @Override

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "animated-logo",
-  "version": "1.0",
+  "id": "animated-mojang-logo",
+  "version": "1.1",
   "name": "Animated Mojang Logo",
   "authors": [
     "BouncingElf10"
@@ -11,8 +11,8 @@
     "sources": "https://github.com/BouncingElf10/Animated-Mojang-Logo"
   },
   "license": "ZLIB",
-  "icon": "assets/animated-logo/icon.png",
- "environment": "*",
+  "icon": "assets/animated-mojang-logo/icon.png",
+ "environment": "client",
   "entrypoints": {
     "main": [
       "com.bouncingelf10.animatedLogo.AnimatedLogo"

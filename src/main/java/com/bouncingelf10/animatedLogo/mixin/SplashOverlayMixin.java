@@ -198,7 +198,7 @@ public class SplashOverlayMixin {
             if (!inited) {
                 this.frames = new Identifier[FRAMES];
                 for (int i = 0; i < FRAMES; i++) {
-                    this.frames[i] = Identifier.of("animated-logo", "textures/gui/frame_" + i + ".png");
+                    this.frames[i] = Identifier.of("animated-mojang-logo", "textures/gui/frame_" + i + ".png");
                 }
                 inited = true;
             }
@@ -251,7 +251,7 @@ public class SplashOverlayMixin {
         if (progress >= 0.8) {
             f = Math.min(alpha, f + 0.2f);
             int sw = (int) (width * 0.45);
-            context.drawTexture(RenderLayer::getGuiTextured, Identifier.of("animated-logo", "textures/gui/studios.png"),
+            context.drawTexture(RenderLayer::getGuiTextured, Identifier.of("animated-mojang-logo", "textures/gui/studios.png"),
                     x - sw / 2, (int) (y - halfHeight + height - height / 12),
                     0, 0, sw, (int) (height / 5.0), 450, 50, 512, 512, applyAlphaToColor(TEXT_COLOR.getAsInt(), f));
         }
