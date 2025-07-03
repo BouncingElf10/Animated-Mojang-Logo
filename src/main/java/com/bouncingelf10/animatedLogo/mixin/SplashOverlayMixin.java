@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 import static com.bouncingelf10.animatedLogo.AnimatedLogo.LOGGER;
 
@@ -35,7 +36,11 @@ public class SplashOverlayMixin {
     @Unique private static final int FRAMES_PER_FRAME = 2;
     @Unique private float f = 0;
     @Unique private boolean animationDone = false;
+
+    @Unique private static final int MOJANG_BLACK = ColorHelper.getArgb(255, 0, 0, 0);
     @Unique private static final int MOJANG_RED = ColorHelper.getArgb(255, 239, 50, 61);
+
+    @Unique private static final IntSupplier MOJANG_COLOR = () -> (Boolean)MinecraftClient.getInstance().options.getMonochromeLogo().getValue() ? MOJANG_BLACK : MOJANG_RED;
 
     @Unique private boolean soundPlayed = false;
     @Unique private boolean animationReady = false;
@@ -110,12 +115,14 @@ public class SplashOverlayMixin {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+
+
         long elapsed = System.currentTimeMillis() - animationDelayStartTime;
 
         if (elapsed < ANIMATION_DELAY_MS) {
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
-                    ColorHelper.withAlpha((int)((elapsed * 255) / ANIMATION_DELAY_MS / 10), MOJANG_RED));
+                    ColorHelper.withAlpha((int)((elapsed * 255) / ANIMATION_DELAY_MS / 10), MOJANG_COLOR.getAsInt()));
             ci.cancel();
             return;
         }
@@ -132,7 +139,7 @@ public class SplashOverlayMixin {
 
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
-                    MOJANG_RED);
+                    MOJANG_COLOR.getAsInt());
 
             drawLoadingBar(context, 1.0f, Math.max(loadingBarProgress, reload.getProgress()));
             loadingBarProgress = reload.getProgress();
@@ -150,7 +157,7 @@ public class SplashOverlayMixin {
             float fadeFactor = 1.0f - MathHelper.clamp((float)elapsedFade / FADE_OUT_DURATION_MS, 0.0f, 1.0f);
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
-                    MOJANG_RED);
+                    MOJANG_COLOR.getAsInt());
 
             drawLoadingBar(context, fadeFactor, Math.max(loadingBarProgress, reload.getProgress()));
             loadingBarProgress = reload.getProgress();
@@ -208,7 +215,7 @@ public class SplashOverlayMixin {
 
             context.fill(RenderLayer.getGuiOverlay(), 0, 0,
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
-                    MOJANG_RED);
+                    MOJANG_COLOR.getAsInt());
 
             context.drawTexture(RenderLayer::getGuiTextured, frames[frameIndex], x, y,
                     0, subFrameY, width, height,
