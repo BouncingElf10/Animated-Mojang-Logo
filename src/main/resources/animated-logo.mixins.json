@@ -6,8 +6,6 @@
   "mixins": [
     "SplashOverlayMixin"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
   }
