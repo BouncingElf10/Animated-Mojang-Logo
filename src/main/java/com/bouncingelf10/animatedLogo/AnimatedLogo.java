@@ -19,7 +19,7 @@ public class AnimatedLogo implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("[Animated Mojang Logo] Initializing Startup Animation, DLS: {}", !isDarkLoadingScreenNotPresent());
+        LOGGER.info("Initializing Startup Animation, DLS: {}", !isDarkLoadingScreenNotPresent());
         Registry.register(Registries.SOUND_EVENT, STARTUP_SOUND_ID, STARTUP_SOUND_EVENT);
     }
 }

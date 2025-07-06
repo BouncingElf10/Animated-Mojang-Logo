@@ -17,7 +17,7 @@ public class DarkLoadingScreenCompat {
             Object config = configClass.getMethod("read").invoke(null);
             return configClass.getField("bar").getInt(config);
         } catch (Exception e) {
-            LOGGER.error("[Animated Mojang Logo] Failed to access Dark Loading Screen config", e);
+            LOGGER.error("Failed to access Dark Loading Screen config", e);
             return fallback;
         }
     }
@@ -30,7 +30,7 @@ public class DarkLoadingScreenCompat {
             Object config = configClass.getMethod("read").invoke(null);
             return configClass.getField("border").getInt(config);
         } catch (Exception e) {
-            LOGGER.error("[Animated Mojang Logo] Failed to access Dark Loading Screen config", e);
+            LOGGER.error("Failed to access Dark Loading Screen config", e);
             return fallback;
         }
     }
@@ -43,7 +43,7 @@ public class DarkLoadingScreenCompat {
             Object config = configClass.getMethod("read").invoke(null);
             return configClass.getField("logo").getInt(config);
         } catch (Exception e) {
-            LOGGER.error("[Animated Mojang Logo] Failed to access Dark Loading Screen config", e);
+            LOGGER.error("Failed to access Dark Loading Screen config", e);
             return fallback;
         }
     }

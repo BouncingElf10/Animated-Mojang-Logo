@@ -24,6 +24,7 @@ import java.util.function.IntSupplier;
 import static com.bouncingelf10.animatedLogo.AnimatedLogo.LOGGER;
 
 @Mixin(SplashOverlay.class)
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 public class SplashOverlayMixin {
     @Mutable
     @Shadow @Final private ResourceReload reload;
@@ -191,7 +192,7 @@ public class SplashOverlayMixin {
                 MinecraftClient.getInstance().getSoundManager().play(
                         PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
                 );
-                LOGGER.info("[Animated Mojang Logo] Playing startup sound");
+                LOGGER.info("Playing startup sound");
                 soundPlayed = true;
             }
 
