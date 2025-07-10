@@ -174,7 +174,7 @@ public class SplashOverlayMixin {
                     context.getScaledWindowWidth(), context.getScaledWindowHeight(),
                     applyAlphaToColor(BRAND_ARGB.getAsInt(), 1.0f));
 
-            drawLoadingBar(context, fadeFactor, Math.max(loadingBarProgress, reload.getProgress()));
+            drawLoadingBar(context, fadeFactor, 1.0f);
             loadingBarProgress = reload.getProgress();
 
             if (fadeFactor <= 0.0) {
