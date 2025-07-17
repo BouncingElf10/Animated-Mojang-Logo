@@ -70,6 +70,8 @@ public class SplashOverlayMixin {
     @Unique private static final long FADE_OUT_DURATION_MS = 1000; // in milliseconds
     @Unique private static float loadingBarProgress = 0.0f; // in seconds
 
+    @Unique private static boolean HAS_LOADED_ONCE = false;
+
     // Draw vanilla loading bar
     // Copied from: net.minecraft.client.gui.screen.SplashOverlay.renderProgressBar
     @Unique
@@ -102,6 +104,10 @@ public class SplashOverlayMixin {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(MinecraftClient client, ResourceReload monitor, Consumer<Throwable> exceptionHandler, boolean reloading, CallbackInfo ci) {
+        if (HAS_LOADED_ONCE) {
+            LOGGER.warn("Animated Mojang Logo has already been loaded once, skipping initialization.");
+            return;
+        }
         animationDelayStartTime = System.currentTimeMillis();
     }
 
@@ -110,13 +116,13 @@ public class SplashOverlayMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", ordinal = 0),
             index = 7)
     private int removeText1(int i) {
-        return 0;
+        return HAS_LOADED_ONCE ? i : 0;
     }
     @ModifyArg(method = "render",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Ljava/util/function/Function;Lnet/minecraft/util/Identifier;IIFFIIIIIII)V", ordinal = 1),
             index = 7)
     private int removeText2(int u) {
-        return 0;
+        return HAS_LOADED_ONCE ? u : 0;
     }
 
     // Stop rendering of loading bar
@@ -124,12 +130,16 @@ public class SplashOverlayMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SplashOverlay;renderProgressBar(Lnet/minecraft/client/gui/DrawContext;IIIIF)V", ordinal = 0),
             index = 5)
     private float removeBar(float opacity) {
-        return 0.0f;
+        return HAS_LOADED_ONCE ? opacity : 0;
     }
 
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (HAS_LOADED_ONCE) {
+            return;
+        }
+
         long elapsed = System.currentTimeMillis() - animationDelayStartTime;
 
         if (elapsed < ANIMATION_DELAY_MS) {
@@ -245,7 +255,7 @@ public class SplashOverlayMixin {
                                    @Local(ordinal = 3) float alpha, @Local(ordinal = 4) int x, @Local(ordinal = 5) int y,
                                    @Local(ordinal = 0) double height, @Local(ordinal = 6) int halfHeight,
                                    @Local(ordinal = 1) double width, @Local(ordinal = 7) int halfWidth) {
-        if (!animationDone) return;
+        if (!animationDone || HAS_LOADED_ONCE) return;
 
         // Studios.png
         float progress = MathHelper.clamp(this.progress * 0.95F + this.reload.getProgress() * 0.050000012F, 0.0F, 1.0F);
@@ -270,6 +280,12 @@ public class SplashOverlayMixin {
         context.drawTexture(RenderLayer::getGuiTextured, finalFrame, finalFrameX, finalFrameY,
                 0, finalSubFrameY, finalFrameWidth, finalFrameHeight,
                 1024, 256, 1024, 1024, applyAlphaToColor(TEXT_COLOR.getAsInt(), alpha));
+
+
+        if (progress >= 0.99798374) { // idk why this isn't 1.0, but it works
+            HAS_LOADED_ONCE = true;
+        }
+
     }
 
     @Unique
