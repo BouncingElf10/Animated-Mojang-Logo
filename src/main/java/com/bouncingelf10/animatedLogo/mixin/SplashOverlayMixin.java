@@ -281,8 +281,6 @@ public class SplashOverlayMixin {
                 0, finalSubFrameY, finalFrameWidth, finalFrameHeight,
                 1024, 256, 1024, 1024, applyAlphaToColor(TEXT_COLOR.getAsInt(), alpha));
 
-        LOGGER.info(String.valueOf(alpha));
-
         if (alpha <= 0.0f) {
             HAS_LOADED_ONCE = true;
         }
