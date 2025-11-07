@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 
 import static com.bouncingelf10.animatedLogo.AnimatedLogo.LOGGER;
+import static com.bouncingelf10.animatedLogo.AnimatedLogo.MOD_ID;
 
 @Mixin(SplashOverlay.class)
 @SuppressWarnings({"FieldMayBeFinal","unused"})
@@ -69,6 +70,10 @@ public class SplashOverlayMixin {
     @Unique private long fadeOutStartTime = -1;
     @Unique private static final long FADE_OUT_DURATION_MS = 1000; // in milliseconds
     @Unique private static float loadingBarProgress = 0.0f; // in seconds
+    @Unique private long postLogoStartTime = -1L;
+    @Unique private static final long POST_LOGO_DELAY_MS = 500L;
+    @Unique private static final long POST_LOGO_FADE_DURATION_MS = 1000L;
+    @Unique private float postLogoAlpha = 1.0f;
 
     @Unique private static boolean HAS_LOADED_ONCE = false;
 
@@ -133,6 +138,14 @@ public class SplashOverlayMixin {
         return HAS_LOADED_ONCE ? opacity : 0;
     }
 
+    @Inject(method = "render",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;setOverlay(Lnet/minecraft/client/gui/screen/Overlay;)V"),
+            cancellable = true)
+    private void preventEarlyRemoval(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (!HAS_LOADED_ONCE) {
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void preRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -257,17 +270,6 @@ public class SplashOverlayMixin {
                                    @Local(ordinal = 1) double width, @Local(ordinal = 7) int halfWidth) {
         if (!animationDone || HAS_LOADED_ONCE) return;
 
-        // Studios.png
-        float progress = MathHelper.clamp(this.progress * 0.95F + this.reload.getProgress() * 0.050000012F, 0.0F, 1.0F);
-        if (progress >= 0.8) {
-            f = Math.min(alpha, f + 0.2f);
-            int sw = (int) (width * 0.45);
-            context.drawTexture(RenderPipelines.GUI_TEXTURED, Identifier.of("animated-mojang-logo", "textures/gui/studios.png"),
-                    x - sw / 2, (int) (y - halfHeight + height - height / 12),
-                    0, 0, sw, (int) (height / 5.0), 450, 50, 512, 512, applyAlphaToColor(TEXT_COLOR.getAsInt(), f));
-        }
-
-        // Title (last frame)
         int finalFrameScreenWidth = context.getScaledWindowWidth();
         int finalFrameScreenHeight = context.getScaledWindowHeight();
         int finalFrameWidth = finalFrameScreenWidth / 2;
@@ -277,14 +279,46 @@ public class SplashOverlayMixin {
         int finalSubFrameY = 256 * ((count % (IMAGE_PER_FRAME * FRAMES_PER_FRAME)) / FRAMES_PER_FRAME);
 
         Identifier finalFrame = frames[FRAMES - 1];
+
+        context.fill(RenderPipelines.GUI, 0, 0,
+                context.getScaledWindowWidth(), context.getScaledWindowHeight(),
+                applyAlphaToColor(BRAND_ARGB.getAsInt(), postLogoAlpha));
+
+        float progress = MathHelper.clamp(this.progress * 0.95F + this.reload.getProgress() * 0.050000012F, 0.0F, 1.0F);
+        if (progress >= 0.8f && postLogoStartTime == -1L) {
+            postLogoStartTime = System.currentTimeMillis();
+        }
+
+        if (postLogoStartTime != -1L) {
+            long elapsedSincePostLogo = System.currentTimeMillis() - postLogoStartTime;
+
+            if (elapsedSincePostLogo > POST_LOGO_DELAY_MS) {
+                float fadeProgress = MathHelper.clamp(
+                        (float)(elapsedSincePostLogo - POST_LOGO_DELAY_MS) / POST_LOGO_FADE_DURATION_MS,
+                        0.0f, 1.0f
+                );
+                postLogoAlpha = 1.0f - fadeProgress;
+            }
+        }
+
+        int effectiveAlpha = applyAlphaToColor(TEXT_COLOR.getAsInt(), postLogoAlpha);
         context.drawTexture(RenderPipelines.GUI_TEXTURED, finalFrame, finalFrameX, finalFrameY,
                 0, finalSubFrameY, finalFrameWidth, finalFrameHeight,
-                1024, 256, 1024, 1024, applyAlphaToColor(TEXT_COLOR.getAsInt(), alpha));
+                1024, 256, 1024, 1024, effectiveAlpha);
 
-        if (alpha <= 0.0f) {
+        if (progress >= 0.8) {
+            f = Math.min(postLogoAlpha, f + 0.2f);
+            int sw = (int) (width * 0.45);
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, Identifier.of(MOD_ID, "textures/gui/studios.png"),
+                    x - sw / 2, (int) (y - halfHeight + height - height / 12),
+                    0, 0, sw, (int) (height / 5.0), 450, 50, 512, 512, applyAlphaToColor(TEXT_COLOR.getAsInt(), f * postLogoAlpha));
+        }
+
+        if (postLogoAlpha <= 0.0f) {
             HAS_LOADED_ONCE = true;
         }
     }
+
 
     @Unique
     private static int applyAlphaToColor(int color, float alpha) {
