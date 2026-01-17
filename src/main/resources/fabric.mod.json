@@ -3,12 +3,12 @@
   "id": "animated-mojang-logo",
   "version": "1.2",
   "name": "Animated Mojang Logo",
-  "description": "This mod aims to replace the old boring Minecraft loading screen with the nice animation from Minecraft Dungeons / MC Live with the accompanying jingle.",
   "authors": [
     "BouncingElf10"
   ],
   "contributors": [
-    "ilgrandeanonimo"
+    "ilgrandeanonimo",
+    "StarsShine11904"
   ],
   "contact": {
     "homepage": "https://github.com/BouncingElf10/Animated-Mojang-Logo",
