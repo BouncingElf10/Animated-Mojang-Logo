@@ -213,7 +213,7 @@ public class SplashOverlayMixin {
 
             if (!soundPlayed) {
                 MinecraftClient.getInstance().getSoundManager().play(
-                        PositionedSoundInstance.master(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
+                        PositionedSoundInstance.ui(AnimatedLogo.STARTUP_SOUND_EVENT, 1.0F)
                 );
                 LOGGER.info("Playing startup sound");
                 soundPlayed = true;
