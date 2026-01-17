@@ -1,3 +1,6 @@
+> [!NOTE]
+> This mod is planned to undergo a major rewrite.
+
 # Animated Minecraft Logo
 
 This mod aims to replace the old boring Minecraft loading screen with the nice animation from Minecraft Dungeons / MC Live with the accopanying jingle.
