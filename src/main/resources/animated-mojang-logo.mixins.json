@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "com.bouncingelf10.amj.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	},
+	"client": [
+		"LoadingOverlayAccessor",
+		"LoadingOverlayMixin"
+	]
+}
