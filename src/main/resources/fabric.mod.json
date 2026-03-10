@@ -1,9 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "animated-mojang-logo",
-  "version": "1.2",
+  "version": "2.0",
   "name": "Animated Mojang Logo",
-  "description": "This mod aims to replace the old boring Minecraft loading screen with the nice animation from Minecraft Dungeons / MC Live with the accompanying jingle.",
   "authors": [
     "BouncingElf10"
   ],
@@ -17,20 +16,24 @@
   },
   "license": "ZLIB",
   "icon": "assets/animated-mojang-logo/icon.png",
- "environment": "client",
+  "environment": "client",
   "entrypoints": {
-    "main": [
-      "com.bouncingelf10.animatedLogo.AnimatedLogo"
+    "client": [
+      "com.bouncingelf10.amj.AnimatedMojangLogoClient"
+    ],
+    "modmenu": [
+      "com.bouncingelf10.amj.compat.ModMenuCompat"
     ]
   },
   "mixins": [
-    "animated-logo.mixins.json"
+    "animated-mojang-logo.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.16.5",
-    "minecraft": ">=1.21.2 <=1.21.5",
+    "minecraft": "1.21.1",
     "java": ">=21",
+    "timelesslib": "*",
+    "yet_another_config_lib_v3": ">=3.6.1+1.21-fabric",
     "fabric-api": "*"
-  },
-  "accessWidener" : "animated-logo.accesswidener"
+  }
 }
