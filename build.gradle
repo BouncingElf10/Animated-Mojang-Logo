@@ -1,6 +1,7 @@
 plugins {
     id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
     id 'maven-publish'
+    id("me.modmuss50.mod-publish-plugin") version "0.8.1"
 }
 
 version = project.mod_version
@@ -48,6 +49,25 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
     modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     modImplementation "maven.modrinth:timelesslib:${project.timelesslib_version}"
+}
+
+publishMods {
+    file = tasks.remapJar.archiveFile
+    changelog = "Major rewrite with smoother animation and higher resolution textures"
+    type = STABLE
+    modLoaders.add("fabric")
+
+    modrinth {
+        projectId = "dWUOweyL"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add("1.21.1")
+    }
+
+    curseforge {
+        projectId = "1253070"
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        minecraftVersions.add("1.21.1")
+    }
 }
 
 processResources {
