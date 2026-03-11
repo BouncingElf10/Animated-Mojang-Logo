@@ -14,6 +14,17 @@ data class YarnVersion(
     val stable: Boolean
 )
 
+@Serializable
+data class VersionsResponse(
+    val game: List<MinecraftVersion>
+)
+
+@Serializable
+data class MinecraftVersion(
+    val version: String,
+    val stable: Boolean
+)
+
 data class Versions(
     val loaderVersion: LoaderVersion,
     val yarnVersion: YarnVersion,
