@@ -1,7 +1,11 @@
+import me.modmuss50.mpp.ReleaseType
+
 plugins {
     id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
     id 'maven-publish'
     id("me.modmuss50.mod-publish-plugin") version "0.8.1"
+
+    id("fabric.compat")
 }
 
 version = project.mod_version
@@ -54,7 +58,7 @@ dependencies {
 publishMods {
     file = tasks.remapJar.archiveFile
     changelog = "Major rewrite with smoother animation and higher resolution textures"
-    type = STABLE
+    type = ReleaseType.STABLE
     modLoaders.add("fabric")
 
     modrinth {
