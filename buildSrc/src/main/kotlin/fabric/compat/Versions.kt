@@ -26,6 +26,7 @@ data class MinecraftVersion(
 )
 
 data class Versions(
+    val mcVersion: MinecraftVersion,
     val loaderVersion: LoaderVersion,
     val yarnVersion: YarnVersion,
     val fabricApiVersion: String,
