@@ -1,7 +1,19 @@
 package fabric.compat
 
 object GradleRunner {
-    fun doTests(): List<TestResult> {
+    suspend fun doTests() { // : List<TestResult>
+        FileManager.dupeGradleProperties()
+        val currentVersion = FabricMeta.getCurrentVersion()
+        var results = ArrayList<TestResult>()
+
+        val result = TestResult(tryAndBuild(), FabricMeta.resolveVersions(currentVersion))
+        results.add(result)
+
+        val forwardPassResults = doForwardPass(currentVersion)
+        val backwardPassResults = doBackwardPass(currentVersion)
+
+        forwardPassResults.forEach { result -> results.add(result) }
+        backwardPassResults.forEach { result -> results.add(result) }
         // Dupe gradle.properties
         // record current version
 
@@ -13,7 +25,14 @@ object GradleRunner {
 
         // apply results if wanted
         // prettify results
-        TODO()
+    }
+
+    private fun doForwardPass(currentVersion: String): List<TestResult> {
+        TODO("Not yet implemented")
+    }
+
+    private fun doBackwardPass(currentVersion: String): List<TestResult> {
+        TODO("Not yet implemented")
     }
 
     fun tryAndBuild(): BuildResult {

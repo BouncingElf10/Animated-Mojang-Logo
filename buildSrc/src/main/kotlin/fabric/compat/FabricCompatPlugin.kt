@@ -1,6 +1,5 @@
 package fabric.compat
 
-import kotlinx.coroutines.runBlocking
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

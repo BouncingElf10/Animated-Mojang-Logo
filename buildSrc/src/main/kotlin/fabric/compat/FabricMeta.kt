@@ -76,6 +76,7 @@ object FabricMeta {
         val fabricApi = getFabricApiVersion(mcVersion)
 
         return Versions(
+            mcVersion = MinecraftVersion(mcVersion, true),
             loaderVersion = loader,
             yarnVersion = yarn,
             fabricApiVersion = fabricApi,
