@@ -11,71 +11,41 @@ import java.io.File
 import java.util.Locale.getDefault
 
 object FabricMeta {
-    const val NO_MORE_VERSIONS = "__NO_MORE_VERSIONS__"
-
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
         }
     }
 
+    @Volatile
     private var loaderCache: LoaderVersion? = null
 
-    fun getCurrentVersion(): String {
-        val lines = File("gradle.properties").readLines()
-        val versionLine = lines.firstOrNull { it.startsWith("minecraft_version=") }
-            ?: error("minecraft_version not found in gradle.properties")
-        return versionLine.split("=")[1].trim()
+    fun getCurrentVersion(projectDir: File): String {
+        val props = File(projectDir, "gradle.properties")
+        return props.readLines().firstOrNull { it.startsWith("minecraft_version=") }?.substringAfter('=')?.trim()
+            ?: error("minecraft_version not found in ${props.absolutePath}")
     }
 
     private suspend fun getStableVersionList(): List<MinecraftVersion> {
-        val response = client.get("https://meta.fabricmc.net/v2/versions").body<VersionsResponse>()
-        return response.game.filter {
-            val mc = it.version.lowercase(getDefault()).trim()
-            // Match both x.y and x.y.z version formats
-            it.stable && mc.contains(Regex("^\\d+\\.\\d+(\\.\\d+)?$"))
+        return client.get("https://meta.fabricmc.net/v2/versions").body<VersionsResponse>().game.filter { mv ->
+            mv.stable && mv.version.lowercase(getDefault()).trim().matches(Regex("""^\d+\.\d+(\.\d+)?$"""))
         }
     }
 
-    suspend fun getNextVersion(version: String): String {
-        val stableVersionList = getStableVersionList()
-        val currentIndex = stableVersionList.indexOfFirst { it.version == version }
-        return if (currentIndex != -1 && currentIndex + 1 < stableVersionList.size) {
-            stableVersionList[currentIndex + 1].version
-        } else {
-            NO_MORE_VERSIONS
-        }
-    }
+    suspend fun getAllStableVersions(): List<MinecraftVersion> = getStableVersionList()
 
-    suspend fun getPrevVersion(version: String): String {
-        val stableVersionList = getStableVersionList()
-        val currentIndex = stableVersionList.indexOfFirst { it.version == version }
-        return if (currentIndex > 0) {
-            stableVersionList[currentIndex - 1].version
-        } else {
-            NO_MORE_VERSIONS
-        }
+    suspend fun prewarmLoader() {
+        if (loaderCache != null) return
+        val loaders = client.get("https://meta.fabricmc.net/v2/versions/loader").body<List<LoaderVersion>>()
+        loaderCache = loaders.firstOrNull { it.stable } ?: loaders.first()
     }
 
     suspend fun resolveVersions(mcVersion: String): Versions {
-        val loader = loaderCache ?: run {
-            val loaders = client
-                .get("https://meta.fabricmc.net/v2/versions/loader")
-                .body<List<LoaderVersion>>()
+        val loader = loaderCache ?: error("Call prewarmLoader() before resolveVersions()")
 
-            val l = loaders.firstOrNull { it.stable }
-                ?: loaders.first()
+        val yarnList = client.get("https://meta.fabricmc.net/v2/versions/yarn/$mcVersion").body<List<YarnVersion>>()
 
-            loaderCache = l
-            l
-        }
-
-        val yarnList = client
-            .get("https://meta.fabricmc.net/v2/versions/yarn/$mcVersion")
-            .body<List<YarnVersion>>()
-
-        val yarn = yarnList.firstOrNull { it.stable }
-            ?: yarnList.firstOrNull()
+        val yarn = yarnList.firstOrNull { it.stable } ?: yarnList.firstOrNull()
             ?: error("No yarn mappings found for $mcVersion")
 
         val fabricApi = getFabricApiVersion(mcVersion)
@@ -90,18 +60,10 @@ object FabricMeta {
     }
 
     suspend fun getFabricApiVersion(mcVersion: String): String {
-        val xml = client.get(
-            "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml"
-        ).body<String>()
+        val xml = client.get("https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/maven-metadata.xml")
+            .body<String>()
 
-        val regex = Regex("<version>([^<]+\\+$mcVersion)</version>")
-        val matches = regex.findAll(xml).map { it.groupValues[1] }.toList()
-
-        return matches.lastOrNull()
+        return Regex("<version>([^<]+\\+$mcVersion)</version>").findAll(xml).map { it.groupValues[1] }.lastOrNull()
             ?: error("No Fabric API version for $mcVersion")
-    }
-
-    fun close() {
-        client.close()
     }
 }

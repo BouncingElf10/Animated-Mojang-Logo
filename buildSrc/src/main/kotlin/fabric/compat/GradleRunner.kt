@@ -1,97 +1,102 @@
 package fabric.compat
 
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import java.io.File
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 object GradleRunner {
     private val isWindows = System.getProperty("os.name").lowercase().contains("win")
-    private val gradleCommand = if (isWindows) "gradlew.bat" else "./gradlew"
+    private val gradleWrapper = if (isWindows) "gradlew.bat" else "gradlew"
 
-    suspend fun doTests(): ArrayList<TestResult> {
-        FileManager.dupeGradleProperties()
-        return try {
-            val currentVersion = FabricMeta.getCurrentVersion()
-            val results = ArrayList<TestResult>()
+    var maxStrikes: Int = 3
 
-            val result = TestResult(tryAndBuild(), FabricMeta.resolveVersions(currentVersion))
-            results.add(result)
+    suspend fun doTests(projectDir: File): List<TestResult> {
+        val currentVersion = FabricMeta.getCurrentVersion(projectDir)
+        FabricMeta.prewarmLoader()
 
-            val forwardPassResults = doForwardPass(currentVersion)
-            val backwardPassResults = doBackwardPass(currentVersion)
+        val allVersions = FabricMeta.getAllStableVersions()
+        val currentIndex = allVersions.indexOfFirst { it.version == currentVersion }
+        require(currentIndex != -1) { "Current version $currentVersion not found in stable list" }
 
-            forwardPassResults.forEach { r -> results.add(r) }
-            backwardPassResults.forEach { r -> results.add(r) }
+        val forwardVersions = allVersions.subList(0, currentIndex).reversed().take(maxStrikes * 2)
+        val backwardVersions = allVersions.subList(currentIndex + 1, allVersions.size).take(maxStrikes * 2)
 
-            results
-        } finally {
-            // Always revert, even if an exception was thrown
-            FileManager.copyAndRevert()
+        val versionsToTest = buildList {
+            add(currentVersion)
+            addAll(forwardVersions.map { it.version })
+            addAll(backwardVersions.map { it.version })
+        }
+
+        val resolved: Map<String, Versions> = coroutineScope {
+            versionsToTest.map { v -> async { v to FabricMeta.resolveVersions(v) } }.awaitAll().toMap()
+        }
+        val currentResult = runBuildForVersion(resolved[currentVersion]!!, projectDir)
+
+        val forwardResults =
+            applyStrikes(forwardVersions.map { runBuildForVersion(resolved[it.version]!!, projectDir) })
+        val backwardResults =
+            applyStrikes(backwardVersions.map { runBuildForVersion(resolved[it.version]!!, projectDir) })
+
+        return buildList {
+            add(currentResult)
+            addAll(forwardResults)
+            addAll(backwardResults)
         }
     }
 
-    private fun doForwardPass(currentVersion: String): ArrayList<TestResult> {
-        return doVersionPass(currentVersion) { version -> runBlocking { FabricMeta.getNextVersion(version) } }
-    }
-
-    private fun doBackwardPass(currentVersion: String): List<TestResult> {
-        return doVersionPass(currentVersion) { version -> runBlocking { FabricMeta.getPrevVersion(version) } }
-    }
-
-    private fun doVersionPass(currentVersion: String, getNextVersion: (String) -> String): ArrayList<TestResult> {
+    private fun applyStrikes(results: List<TestResult>): List<TestResult> {
         var strikes = 0
-        var version = currentVersion
-        val results = ArrayList<TestResult>()
+        return results.takeWhile { result ->
+            if (!result.buildResult.success) strikes++ else strikes = 0
+            strikes <= maxStrikes
+        }
+    }
 
-        while (strikes < 3) {
-            val nextVersion = getNextVersion(version)
+    private fun runBuildForVersion(versions: Versions, projectDir: File): TestResult {
+        return TestResult(runBuild(projectDir, versions), versions)
+    }
 
-            if (nextVersion == FabricMeta.NO_MORE_VERSIONS) {
-                println("No more versions to check in this direction.")
-                break
-            }
+    fun runBuild(projectDir: File, versions: Versions? = null): BuildResult {
+        val wrapperPath = File(projectDir, gradleWrapper).absolutePath
+        val cacheDir = versions?.let { File(projectDir, ".gradle-compat-${it.mcVersion.version}") }
 
-            version = nextVersion
-            val versions = runBlocking { FabricMeta.resolveVersions(version) }
-            FileManager.replaceProperties(versions)
-
-            val result = tryAndBuild()
-            results.add(TestResult(result, versions))
-            if (!result.success) {
-                strikes++
+        val args = buildList {
+            add(wrapperPath)
+            add("build")
+            add("--warning-mode=all")
+            if (versions != null && cacheDir != null) {
+                add("-Pminecraft_version=${versions.mcVersion.version}")
+                add("-Ploader_version=${versions.loaderVersion.version}")
+                add("-Ploom_version=${versions.loomVersion}")
+                add("-Pfabric_api_version=${versions.fabricApiVersion}")
+                add("--project-cache-dir")
+                add(cacheDir.absolutePath)
             }
         }
 
-        return results
-    }
-
-    fun tryAndBuild(): BuildResult {
-        val pb = ProcessBuilder(gradleCommand, "build", "--warning-mode=all")
-        pb.redirectErrorStream(true)
+        val pb = ProcessBuilder(args).directory(projectDir).redirectErrorStream(true)
 
         val process = pb.start()
-        val output = String(process.inputStream.readAllBytes())
+        val output = process.inputStream.bufferedReader().readText()
         val exit = process.waitFor()
 
-        if (exit == 0) {
-            println("Build succeeded")
+        cacheDir?.deleteRecursively()
+
+        val label = versions?.mcVersion?.version ?: "current"
+        val success = exit == 0
+        if (success) {
+            println("  ${Ansi.GREEN}PASS${Ansi.RESET}  [$label]")
         } else {
-            println("Build failed with exit code $exit")
+            println("  ${Ansi.RED}FAIL${Ansi.RESET}  [$label] (exit $exit)")
+            val errorLines = output.lines()
+                .filter { it.contains(": error:") || it.startsWith("* What went wrong") || it.startsWith("> ") }
+            val tail = errorLines.ifEmpty { output.lines().takeLast(15) }
+            println(tail.joinToString("\n") { "        ${Ansi.DIM}$it${Ansi.RESET}" })
         }
 
-        if (output.contains("warning", ignoreCase = true)) {
-            println("Warnings detected")
-        }
-
-        return BuildResult(exit == 0, exit, output)
+        return BuildResult(success, exit, output)
     }
 
-    data class BuildResult(
-        val success: Boolean,
-        val exitCode: Int,
-        val output: String,
-    )
-
-    data class TestResult(
-        val buildResult: BuildResult,
-        val versions: Versions
-    )
+    data class BuildResult(val success: Boolean, val exitCode: Int, val output: String)
+    data class TestResult(val buildResult: BuildResult, val versions: Versions)
 }
