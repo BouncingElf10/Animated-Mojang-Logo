@@ -11,6 +11,8 @@ import java.io.File
 import java.util.Locale.getDefault
 
 object FabricMeta {
+    const val NO_MORE_VERSIONS = "__NO_MORE_VERSIONS__"
+
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
@@ -20,35 +22,38 @@ object FabricMeta {
     private var loaderCache: LoaderVersion? = null
 
     fun getCurrentVersion(): String {
-        val version = File("gradle.properties").readLines().filter { str -> str.startsWith("minecraft_version") }
-        return version[0].split("=")[1].trim()
+        val lines = File("gradle.properties").readLines()
+        val versionLine = lines.firstOrNull { it.startsWith("minecraft_version=") }
+            ?: error("minecraft_version not found in gradle.properties")
+        return versionLine.split("=")[1].trim()
     }
 
     private suspend fun getStableVersionList(): List<MinecraftVersion> {
         val response = client.get("https://meta.fabricmc.net/v2/versions").body<VersionsResponse>()
         return response.game.filter {
             val mc = it.version.lowercase(getDefault()).trim()
-            it.stable && mc.contains(Regex("^\\d+\\.\\d+\\.\\d+$"))
+            // Match both x.y and x.y.z version formats
+            it.stable && mc.contains(Regex("^\\d+\\.\\d+(\\.\\d+)?$"))
         }
     }
 
     suspend fun getNextVersion(version: String): String {
         val stableVersionList = getStableVersionList()
         val currentIndex = stableVersionList.indexOfFirst { it.version == version }
-        return try {
+        return if (currentIndex != -1 && currentIndex + 1 < stableVersionList.size) {
             stableVersionList[currentIndex + 1].version
-        } catch (_: Exception) {
-            "No more versions to check!"
+        } else {
+            NO_MORE_VERSIONS
         }
     }
 
     suspend fun getPrevVersion(version: String): String {
         val stableVersionList = getStableVersionList()
         val currentIndex = stableVersionList.indexOfFirst { it.version == version }
-        return try {
+        return if (currentIndex > 0) {
             stableVersionList[currentIndex - 1].version
-        } catch (_: Exception) {
-            "No more versions to check!"
+        } else {
+            NO_MORE_VERSIONS
         }
     }
 
@@ -94,5 +99,9 @@ object FabricMeta {
 
         return matches.lastOrNull()
             ?: error("No Fabric API version for $mcVersion")
+    }
+
+    fun close() {
+        client.close()
     }
 }
