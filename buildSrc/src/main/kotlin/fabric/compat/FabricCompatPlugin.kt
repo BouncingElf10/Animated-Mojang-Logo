@@ -13,9 +13,11 @@ class FabricCompatPlugin : Plugin<Project> {
             doLast {
                 try {
                     val output = runBlocking { GradleRunner.doTests() }
-                    runBlocking { GradleRunner.tryAndBuild() }
                     println(output.toString())
-                } catch (_: Throwable) { println("whoops") }
+                } catch (e: Throwable) {
+                    println("Compatibility check failed: ${e.message}")
+                    throw e
+                }
             }
         }
     }

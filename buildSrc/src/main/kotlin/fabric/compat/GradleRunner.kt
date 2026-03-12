@@ -3,25 +3,29 @@ package fabric.compat
 import kotlinx.coroutines.runBlocking
 
 object GradleRunner {
+    private val isWindows = System.getProperty("os.name").lowercase().contains("win")
+    private val gradleCommand = if (isWindows) "gradlew.bat" else "./gradlew"
+
     suspend fun doTests(): ArrayList<TestResult> {
         FileManager.dupeGradleProperties()
-        val currentVersion = FabricMeta.getCurrentVersion()
-        val results = ArrayList<TestResult>()
+        return try {
+            val currentVersion = FabricMeta.getCurrentVersion()
+            val results = ArrayList<TestResult>()
 
-        val result = TestResult(tryAndBuild(), FabricMeta.resolveVersions(currentVersion))
-        results.add(result)
+            val result = TestResult(tryAndBuild(), FabricMeta.resolveVersions(currentVersion))
+            results.add(result)
 
-        val forwardPassResults = doForwardPass(currentVersion)
-        val backwardPassResults = doBackwardPass(currentVersion)
+            val forwardPassResults = doForwardPass(currentVersion)
+            val backwardPassResults = doBackwardPass(currentVersion)
 
-        forwardPassResults.forEach { result -> results.add(result) }
-        backwardPassResults.forEach { result -> results.add(result) }
+            forwardPassResults.forEach { r -> results.add(r) }
+            backwardPassResults.forEach { r -> results.add(r) }
 
-        FileManager.copyAndRevert()
-
-        return results
-        // apply results if wanted
-        // prettify results
+            results
+        } finally {
+            // Always revert, even if an exception was thrown
+            FileManager.copyAndRevert()
+        }
     }
 
     private fun doForwardPass(currentVersion: String): ArrayList<TestResult> {
@@ -33,14 +37,21 @@ object GradleRunner {
     }
 
     private fun doVersionPass(currentVersion: String, getNextVersion: (String) -> String): ArrayList<TestResult> {
-        var strikes = 0;
-        var version = currentVersion;
-        val results = ArrayList<TestResult>();
+        var strikes = 0
+        var version = currentVersion
+        val results = ArrayList<TestResult>()
 
         while (strikes < 3) {
-            version = getNextVersion(version)
+            val nextVersion = getNextVersion(version)
+
+            if (nextVersion == FabricMeta.NO_MORE_VERSIONS) {
+                println("No more versions to check in this direction.")
+                break
+            }
+
+            version = nextVersion
             val versions = runBlocking { FabricMeta.resolveVersions(version) }
-            FileManager.replaceProperties(runBlocking { versions })
+            FileManager.replaceProperties(versions)
 
             val result = tryAndBuild()
             results.add(TestResult(result, versions))
@@ -53,8 +64,7 @@ object GradleRunner {
     }
 
     fun tryAndBuild(): BuildResult {
-        val pb = ProcessBuilder("gradlew.bat", "build", "--warning-mode=all")
-
+        val pb = ProcessBuilder(gradleCommand, "build", "--warning-mode=all")
         pb.redirectErrorStream(true)
 
         val process = pb.start()
@@ -64,10 +74,10 @@ object GradleRunner {
         if (exit == 0) {
             println("Build succeeded")
         } else {
-            println("Build failed")
+            println("Build failed with exit code $exit")
         }
 
-        if (output.contains("warning")) {
+        if (output.contains("warning", ignoreCase = true)) {
             println("Warnings detected")
         }
 
