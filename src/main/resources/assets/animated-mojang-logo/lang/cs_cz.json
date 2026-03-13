@@ -1,0 +1,23 @@
+{
+  "modmenu.nameTranslation.animated-mojang-logo": "Animované logo Mojang",
+  "modmenu.descriptionTranslation.animated-mojang-logo": "Nahrazuje výchozí načítací obrazovku Minecraftu animovaným intro Mojang Studios z Minecraft Dungeons / Minecraft Live, včetně jinglu.",
+  "config.animated-mojang-logo.title": "Animované logo Mojang",
+  "config.animated-mojang-logo.category.general": "Obecné",
+  "config.animated-mojang-logo.category.colors": "Barvy",
+  "config.animated-mojang-logo.enabled": "Povoleno",
+  "config.animated-mojang-logo.enabled.desc": "Povolí nebo zakáže mod.",
+  "config.animated-mojang-logo.override_colors": "Přepsat barvy",
+  "config.animated-mojang-logo.override_colors.desc": "Použít vlastní barvy místo výchozích.",
+  "config.animated-mojang-logo.only_play_once": "Přehrát pouze jednou",
+  "config.animated-mojang-logo.only_play_once.desc": "Pokud je povoleno, animace se přehraje pouze jednou při spuštění hry.",
+  "config.animated-mojang-logo.hold_seconds": "Doba zobrazení (sek.)",
+  "config.animated-mojang-logo.hold_seconds.desc": "Jak dlouho logo zůstane na obrazovce před přechodem do hlavního menu.",
+  "config.animated-mojang-logo.background": "Pozadí",
+  "config.animated-mojang-logo.bar": "Panel průběhu",
+  "config.animated-mojang-logo.bar_background": "Pozadí panelu",
+  "config.animated-mojang-logo.bar_border": "Okraj panelu",
+  "config.animated-mojang-logo.logo": "Logo",
+  "config.animated-mojang-logo.logo.desc": "Barva textu \"MOJANG\".",
+  "config.animated-mojang-logo.studios": "Studios",
+  "config.animated-mojang-logo.studios.desc": "Barva textu \"STUDIOS\"."
+}
