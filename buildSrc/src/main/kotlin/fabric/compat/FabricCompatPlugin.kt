@@ -102,5 +102,28 @@ class FabricCompatPlugin : Plugin<Project> {
                 println()
             }
         }
+
+        project.tasks.register("revertCompatPatches") {
+            group = "fabric"
+            description = "Restores project files from the compat-patch backups in .gradle/compat-backups/"
+
+            doLast {
+                println()
+                println("${Ansi.BOLD}Reverting Fabric compat patches…${Ansi.RESET}")
+                println()
+
+                val results = CompatPatcher.revertFromBackups(project.projectDir)
+                results.forEach { CompatPatcher.printRevertResult(it) }
+
+                val restored = results.filterIsInstance<CompatPatcher.RevertResult.Restored>()
+                println()
+                if (restored.isNotEmpty()) {
+                    println("${Ansi.GREEN}${restored.size} file(s) restored.${Ansi.RESET}  Backups removed from .gradle/compat-backups/")
+                } else {
+                    println("${Ansi.DIM}No files were restored.${Ansi.RESET}")
+                }
+                println()
+            }
+        }
     }
 }

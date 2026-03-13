@@ -13,12 +13,61 @@ object CompatPatcher {
         })
         return if (sorted.size == 1) sorted[0] else ">=${sorted.first()} <=${sorted.last()}"
     }
-    
+
+    fun backupDir(projectDir: File): File = File(projectDir, ".gradle/compat-backups")
+
     private fun writeBackup(projectDir: File, file: File, content: String) {
-        val backupDir = File(projectDir, ".gradle/compat-backups").also { it.mkdirs() }
-        File(backupDir, file.name + ".bak").writeText(content)
+        File(backupDir(projectDir).also { it.mkdirs() }, file.name + ".bak").writeText(content)
     }
-    
+
+    fun revertFromBackups(projectDir: File): List<RevertResult> {
+        val backupDir = backupDir(projectDir)
+        if (!backupDir.exists()) return listOf(RevertResult.NoneFound)
+
+        val bakFiles = backupDir.listFiles { f -> f.name.endsWith(".bak") }?.toList().orEmpty()
+        if (bakFiles.isEmpty()) return listOf(RevertResult.NoneFound)
+
+        val destinationCandidates: Map<String, List<File>> = mapOf(
+            "fabric.mod.json.bak" to listOf(
+                File(projectDir, "src/main/resources/fabric.mod.json"), File(projectDir, "fabric.mod.json")
+            ),
+            "build.gradle.kts.bak" to listOf(File(projectDir, "build.gradle.kts")),
+            "build.gradle.bak" to listOf(File(projectDir, "build.gradle"))
+        )
+
+        return bakFiles.map { bak ->
+            val candidates = destinationCandidates[bak.name]
+            if (candidates == null) {
+                RevertResult.UnknownBackup(bak.name)
+            } else {
+                val dest = candidates.firstOrNull { it.exists() }
+                if (dest == null) {
+                    RevertResult.DestinationMissing(bak.name, candidates.map { it.path })
+                } else {
+                    dest.writeText(bak.readText())
+                    bak.delete()
+                    RevertResult.Restored(dest.path)
+                }
+            }
+        }
+    }
+
+    sealed class RevertResult {
+        data class Restored(val filePath: String) : RevertResult()
+        data class DestinationMissing(val bakName: String, val tried: List<String>) : RevertResult()
+        data class UnknownBackup(val bakName: String) : RevertResult()
+        object NoneFound : RevertResult()
+    }
+
+    fun printRevertResult(result: RevertResult) {
+        when (result) {
+            is RevertResult.Restored -> println("  ${Ansi.GREEN}RESTORED${Ansi.RESET}  ${Ansi.DIM}${result.filePath}${Ansi.RESET}")
+            is RevertResult.DestinationMissing -> println("  ${Ansi.RED}MISSING${Ansi.RESET}   ${result.bakName} — destination not found (tried: ${result.tried.joinToString()})")
+            is RevertResult.UnknownBackup -> println("  ${Ansi.DIM}SKIP${Ansi.RESET}      ${result.bakName} — not a recognised backup, leaving in place")
+            is RevertResult.NoneFound -> println("  ${Ansi.DIM}Nothing to revert — no backups found in .gradle/compat-backups/${Ansi.RESET}")
+        }
+    }
+
     fun patchFabricModJson(projectDir: File, range: String): PatchResult {
         val candidates = listOf(
             File(projectDir, "src/main/resources/fabric.mod.json"), File(projectDir, "fabric.mod.json")
@@ -28,7 +77,7 @@ object CompatPatcher {
 
         val original = modJson.readText()
 
-        
+
         val regex = Regex("""("minecraft"\s*:\s*)"([^"]*)"(?=\s*[,\}])""")
         if (!regex.containsMatchIn(original)) {
             return PatchResult.NotFound("""No "minecraft" key found inside depends in ${modJson.path}""")
@@ -71,35 +120,37 @@ object CompatPatcher {
         buildFile.writeText(patched)
         return PatchResult.Success(buildFile.path)
     }
-    
-    private fun replaceInEachPublisherBlock(source: String, passingVersions: List<String>, addCallRegex: Regex): String {
+
+    private fun replaceInEachPublisherBlock(
+        source: String, passingVersions: List<String>, addCallRegex: Regex
+    ): String {
         val publisherNames = setOf("modrinth", "curseforge", "github", "gitlab", "discord")
         val blockOpenRegex = Regex("""\b(${publisherNames.joinToString("|")})\s*\{""")
 
         val result = StringBuilder(source)
-        var offset = 0  
+        var offset = 0
 
         for (match in blockOpenRegex.findAll(source)) {
-            val openBracePos = match.range.last       
-            val blockStart = openBracePos + 1       
+            val openBracePos = match.range.last
+            val blockStart = openBracePos + 1
 
             val blockEnd = findMatchingBrace(source, openBracePos) ?: continue
 
-            
+
             val adjStart = blockStart + offset
             val adjEnd = blockEnd + offset
             val blockBody = result.substring(adjStart, adjEnd)
 
-            
+
             val firstAdd = addCallRegex.find(blockBody) ?: continue
             val indent = firstAdd.groupValues[1]
 
-            
+
             val replacement = passingVersions.joinToString("\n") { v ->
                 """${indent}minecraftVersions.add("$v")"""
             } + "\n"
 
-            
+
             var insertPos: Int? = null
             val stripped = buildString {
                 var pos = 0
@@ -111,7 +162,7 @@ object CompatPatcher {
                 append(blockBody, pos, blockBody.length)
             }
 
-            
+
             val newBody = if (insertPos != null) {
                 stripped.substring(0, insertPos!!) + replacement + stripped.substring(insertPos!!)
             } else {
