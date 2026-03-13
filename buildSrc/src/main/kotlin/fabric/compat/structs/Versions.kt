@@ -1,4 +1,4 @@
-package fabric.compat
+package fabric.compat.structs
 
 import kotlinx.serialization.Serializable
 

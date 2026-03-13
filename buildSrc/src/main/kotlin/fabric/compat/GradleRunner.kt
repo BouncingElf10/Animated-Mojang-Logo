@@ -1,5 +1,7 @@
 package fabric.compat
 
+import fabric.compat.structs.Ansi
+import fabric.compat.structs.Versions
 import kotlinx.coroutines.*
 import java.io.File
 
