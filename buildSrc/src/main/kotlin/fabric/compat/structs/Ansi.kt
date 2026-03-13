@@ -1,4 +1,4 @@
-package fabric.compat
+package fabric.compat.structs
 
 object Ansi {
     const val RESET = "\u001B[0m"
