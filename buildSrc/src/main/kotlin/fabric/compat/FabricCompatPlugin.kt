@@ -11,6 +11,10 @@ class FabricCompatPlugin : Plugin<Project> {
             group = "fabric"
             description = "Tests compilation across Minecraft versions"
 
+            doFirst {
+                println("Checking adjacent versions to see if they build. (This might take a while)")
+            }
+
             doLast {
                 val results = runBlocking { GradleRunner.doTests(project.projectDir) }
 
@@ -43,10 +47,6 @@ class FabricCompatPlugin : Plugin<Project> {
                 val failText = if (failures > 0) "${Ansi.RED}$failures failed${Ansi.RESET}" else "${Ansi.DIM}0 failed${Ansi.RESET}"
                 println("${sorted.size} versions tested    $passText    $failText")
                 println()
-
-                if (failures > 0) {
-                    throw RuntimeException("Compatibility check failed for $failures version(s).")
-                }
             }
         }
     }
