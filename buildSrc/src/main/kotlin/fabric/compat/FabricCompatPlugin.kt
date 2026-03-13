@@ -47,6 +47,59 @@ class FabricCompatPlugin : Plugin<Project> {
                 val failText = if (failures > 0) "${Ansi.RED}$failures failed${Ansi.RESET}" else "${Ansi.DIM}0 failed${Ansi.RESET}"
                 println("${sorted.size} versions tested    $passText    $failText")
                 println()
+
+                val passingVersions = sorted.filter { it.buildResult.success }.map { it.versions.mcVersion.version }
+
+                if (passingVersions.isEmpty()) {
+                    println("${Ansi.RED}No passing versions — nothing to patch.${Ansi.RESET}")
+                    return@doLast
+                }
+
+                val range = CompatPatcher.buildMinecraftRange(passingVersions)
+
+                println("${Ansi.BOLD}Compatible range:${Ansi.RESET}  $range")
+                println("${Ansi.BOLD}Passing versions:${Ansi.RESET}  ${passingVersions.joinToString(", ")}")
+                println()
+
+                println("Would you like to automatically update your project files?")
+                println("  ${Ansi.BOLD}[1]${Ansi.RESET} Patch fabric.mod.json only")
+                println("  ${Ansi.BOLD}[2]${Ansi.RESET} Patch build.gradle (mod-publish-plugin) only")
+                println("  ${Ansi.BOLD}[3]${Ansi.RESET} Patch both")
+                println("  ${Ansi.BOLD}[4]${Ansi.RESET} Skip — I'll update manually")
+                print("Enter choice [1-4]: ")
+
+                val choice = readLine()?.trim() ?: "4"
+                println()
+
+                val patchModJson = choice == "1" || choice == "3"
+                val patchBuild = choice == "2" || choice == "3"
+
+                if (!patchModJson && !patchBuild) {
+                    println("${Ansi.DIM}Skipped. Manually set:${Ansi.RESET}")
+                    println("  fabric.mod.json  →  \"minecraft\": \"$range\"")
+                    println("  build.gradle     →  one minecraftVersions.add(...) per version above")
+                    println()
+                    return@doLast
+                }
+
+                println("${Ansi.BOLD}Patching files…${Ansi.RESET}")
+                println()
+
+                if (patchModJson) {
+                    val result = CompatPatcher.patchFabricModJson(project.projectDir, range)
+                    CompatPatcher.printPatchResult("fabric.mod.json  \"minecraft\": \"$range\"", result)
+                }
+
+                if (patchBuild) {
+                    val result = CompatPatcher.patchBuildGradle(project.projectDir, passingVersions)
+                    CompatPatcher.printPatchResult(
+                        "build.gradle     minecraftVersions (${passingVersions.size} versions)", result
+                    )
+                }
+
+                println()
+                println("${Ansi.DIM}Backups written as *.bak in the .gradle/compat-backups/ directory${Ansi.RESET}")
+                println()
             }
         }
     }

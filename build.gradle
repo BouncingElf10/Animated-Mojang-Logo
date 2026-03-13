@@ -1,5 +1,3 @@
-import me.modmuss50.mpp.ReleaseType
-
 plugins {
     id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
     id 'maven-publish'
@@ -58,18 +56,20 @@ dependencies {
 publishMods {
     file = tasks.remapJar.archiveFile
     changelog = "Major rewrite with smoother animation and higher resolution textures"
-    type = ReleaseType.STABLE
+    type = STABLE
     modLoaders.add("fabric")
 
     modrinth {
         projectId = "dWUOweyL"
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add("1.21")
         minecraftVersions.add("1.21.1")
     }
 
     curseforge {
         projectId = "1253070"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        minecraftVersions.add("1.21")
         minecraftVersions.add("1.21.1")
     }
 }
