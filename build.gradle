@@ -53,6 +53,10 @@ dependencies {
     modImplementation "maven.modrinth:timelesslib:${project.timelesslib_version}"
 }
 
+fabricCompat {
+    maxStrikes = 1
+}
+
 publishMods {
     file = tasks.remapJar.archiveFile
     changelog = "Major rewrite with smoother animation and higher resolution textures"

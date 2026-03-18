@@ -10,18 +10,21 @@ object GradleRunner {
     private val isWindows = System.getProperty("os.name").lowercase().contains("win")
     private val gradleWrapper = if (isWindows) "gradlew.bat" else "gradlew"
 
-    var maxStrikes: Int = 3
-
-    suspend fun doTests(projectDir: File): List<TestResult> {
+    suspend fun doTests(projectDir: File, config: FabricCompatExtension): List<TestResult> {
         val currentVersion = FabricMeta.getCurrentVersion(projectDir)
-        FabricMeta.prewarmLoader()
+        FabricMeta.prewarmLoader(config.loaderVersion, projectDir)
 
         val allVersions = FabricMeta.getAllStableVersions()
         val currentIndex = allVersions.indexOfFirst { it.version == currentVersion }
         require(currentIndex != -1) { "Current version $currentVersion not found in stable list" }
 
-        val forwardVersions = allVersions.subList(0, currentIndex).reversed().take(maxStrikes * 2)
-        val backwardVersions = allVersions.subList(currentIndex + 1, allVersions.size).take(maxStrikes * 2)
+        val forwardVersions =
+            if (config.checkNewerVersions) allVersions.subList(0, currentIndex).reversed().take(config.maxStrikes * 2)
+            else emptyList()
+
+        val backwardVersions = if (config.checkOlderVersions) allVersions.subList(currentIndex + 1, allVersions.size)
+            .take(config.maxStrikes * 2)
+        else emptyList()
 
         val versionsToTest = buildList {
             add(currentVersion)
@@ -30,14 +33,17 @@ object GradleRunner {
         }
 
         val resolved: Map<String, Versions> = coroutineScope {
-            versionsToTest.map { v -> async { v to FabricMeta.resolveVersions(v) } }.awaitAll().toMap()
+            versionsToTest.map { v -> async { v to FabricMeta.resolveVersions(v, config, projectDir) } }.awaitAll()
+                .toMap()
         }
-        val currentResult = runBuildForVersion(resolved[currentVersion]!!, projectDir)
 
-        val forwardResults =
-            applyStrikes(forwardVersions.map { runBuildForVersion(resolved[it.version]!!, projectDir) })
-        val backwardResults =
-            applyStrikes(backwardVersions.map { runBuildForVersion(resolved[it.version]!!, projectDir) })
+        val currentResult = runBuildForVersion(resolved[currentVersion]!!, projectDir, config)
+        val forwardResults = applyStrikes(
+            forwardVersions.map { runBuildForVersion(resolved[it.version]!!, projectDir, config) }, config.maxStrikes
+        )
+        val backwardResults = applyStrikes(
+            backwardVersions.map { runBuildForVersion(resolved[it.version]!!, projectDir, config) }, config.maxStrikes
+        )
 
         return buildList {
             add(currentResult)
@@ -46,7 +52,7 @@ object GradleRunner {
         }
     }
 
-    private fun applyStrikes(results: List<TestResult>): List<TestResult> {
+    private fun applyStrikes(results: List<TestResult>, maxStrikes: Int): List<TestResult> {
         var strikes = 0
         return results.takeWhile { result ->
             if (!result.buildResult.success) strikes++ else strikes = 0
@@ -54,18 +60,23 @@ object GradleRunner {
         }
     }
 
-    private fun runBuildForVersion(versions: Versions, projectDir: File): TestResult {
-        return TestResult(runBuild(projectDir, versions), versions)
+    private fun runBuildForVersion(versions: Versions, projectDir: File, config: FabricCompatExtension): TestResult {
+        return TestResult(runBuild(projectDir, versions, config), versions)
     }
 
-    fun runBuild(projectDir: File, versions: Versions? = null): BuildResult {
+    fun runBuild(
+        projectDir: File, versions: Versions? = null, config: FabricCompatExtension = FabricCompatExtension()
+    ): BuildResult {
         val wrapperPath = File(projectDir, gradleWrapper).absolutePath
         val cacheDir = versions?.let { File(projectDir, ".gradle-compat-${it.mcVersion.version}") }
 
         val args = buildList {
             add(wrapperPath)
-            add("build")
+            addAll(config.buildTasks)
             add("--warning-mode=all")
+            if (config.daemonJvmArgs.isNotEmpty()) {
+                add("-Dorg.gradle.jvmargs=${config.daemonJvmArgs.joinToString(" ")}")
+            }
             if (versions != null && cacheDir != null) {
                 add("-Pminecraft_version=${versions.mcVersion.version}")
                 add("-Ploader_version=${versions.loaderVersion.version}")
@@ -77,7 +88,6 @@ object GradleRunner {
         }
 
         val pb = ProcessBuilder(args).directory(projectDir).redirectErrorStream(true)
-
         val process = pb.start()
         val output = process.inputStream.bufferedReader().readText()
         val exit = process.waitFor()
@@ -86,8 +96,10 @@ object GradleRunner {
 
         val label = versions?.mcVersion?.version ?: "current"
         val success = exit == 0
+
         if (success) {
             println("  ${Ansi.GREEN}PASS${Ansi.RESET}  [$label]")
+            if (config.verbose) println(output.lines().joinToString("\n") { "        ${Ansi.DIM}$it${Ansi.RESET}" })
         } else {
             println("  ${Ansi.RED}FAIL${Ansi.RESET}  [$label] (exit $exit)")
             val errorLines = output.lines()
