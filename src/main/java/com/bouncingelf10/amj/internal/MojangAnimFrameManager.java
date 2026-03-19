@@ -9,11 +9,11 @@ import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
-
-import java.util.Vector;
 
 public class MojangAnimFrameManager {
     public static final AnimationTimeline timeline = TimelessLibClient.getClientAnimationManager().createTimeline("mojang_logo");
@@ -62,7 +62,7 @@ public class MojangAnimFrameManager {
 
         AnimatedMojangLogoClient.LOGGER.info("Playing sound and starting Mojang logo animation");
         Minecraft.getInstance().getSoundManager().play(
-            SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f)
+                SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f)
         );
     }
 
@@ -88,10 +88,11 @@ public class MojangAnimFrameManager {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
-        guiGraphics.setColor(color.x, color.y, color.z, opacityStudios);
-        guiGraphics.blit(frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
+        guiGraphics.blit(RenderType::guiTextured, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
+
         RenderSystem.disableBlend();
     }
 
@@ -109,10 +110,11 @@ public class MojangAnimFrameManager {
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
-        guiGraphics.setColor(color.x, color.y, color.z, opacityLogo);
-        guiGraphics.blit(frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
+        guiGraphics.blit(RenderType::guiTextured, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
+
         RenderSystem.disableBlend();
     }
 
