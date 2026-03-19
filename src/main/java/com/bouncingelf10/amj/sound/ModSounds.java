@@ -3,14 +3,14 @@ package com.bouncingelf10.amj.sound;
 import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 public class ModSounds {
     public static final SoundEvent STARTUP = register("startup");
 
     private static SoundEvent register(String id) {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, id);
+        Identifier location = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, id);
         Registry.register(BuiltInRegistries.SOUND_EVENT, location, SoundEvent.createVariableRangeEvent(location));
         return SoundEvent.createVariableRangeEvent(location);
     }

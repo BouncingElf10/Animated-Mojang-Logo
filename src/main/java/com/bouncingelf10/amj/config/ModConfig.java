@@ -2,18 +2,17 @@ package com.bouncingelf10.amj.config;
 
 import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import com.bouncingelf10.amj.internal.ColorManager;
-import dev.isxander.yacl3.config.GsonConfigInstance;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.awt.*;
 
 public class ModConfig {
     public static ConfigClassHandler<ModConfig> INSTANCE = ConfigClassHandler.createBuilder(ModConfig.class)
-            .id(ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "config"))
+            .id(Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("animated-mojang-logo.json")).build()).build();
 

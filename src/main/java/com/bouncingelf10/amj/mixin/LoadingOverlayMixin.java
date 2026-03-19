@@ -4,14 +4,9 @@ import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.internal.ColorManager;
 import com.bouncingelf10.amj.internal.MojangAnimFrameManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import dev.bouncingelf10.timelesslib.TimelessLibClient;
-import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +25,7 @@ public class LoadingOverlayMixin {
 		ci.cancel();
 
 		LoadingOverlayAccessor self = (LoadingOverlayAccessor) this;
-		long now = Util.getMillis();
+		long now = System.currentTimeMillis();
 
 		tickFadeIn(self, now);
 		smoothProgress(self);
@@ -138,6 +133,6 @@ public class LoadingOverlayMixin {
 		self.setFadeOutStart(now);
 
 		if (self.getMinecraft().screen != null)
-			self.getMinecraft().screen.init(self.getMinecraft(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+			self.getMinecraft().screen.init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
 	}
 }

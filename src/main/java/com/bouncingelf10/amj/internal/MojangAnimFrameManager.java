@@ -9,9 +9,8 @@ import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
@@ -84,7 +83,7 @@ public class MojangAnimFrameManager {
         int studiosX = guiGraphics.guiWidth() / 2 - studiosWidth / 2;
         int studiosY = logoY + logoHeight - 25;
 
-        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
+        Identifier frameLocation = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
         int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
@@ -100,7 +99,7 @@ public class MojangAnimFrameManager {
         int x = guiGraphics.guiWidth() / 2 - renderWidth / 2;
         int y = (guiGraphics.guiHeight() - 28) / 2 - renderHeight / 2;
 
-        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
+        Identifier frameLocation = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
