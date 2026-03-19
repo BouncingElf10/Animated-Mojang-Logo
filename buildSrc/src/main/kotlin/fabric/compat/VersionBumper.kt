@@ -25,21 +25,23 @@ object VersionBumper {
         "minecraft_version", "yarn_mappings", "loader_version", "fabric_api_version", "loom_version"
     )
 
-    fun resolveCurrentTargetVersion(projectDir: File): String? {
+    fun resolveCurrentTargetVersion(projectDir: File, bumpUp: Boolean): String? {
         val candidates = listOf(
             File(projectDir, "src/main/resources/fabric.mod.json"), File(projectDir, "fabric.mod.json")
         )
         val modJson = candidates.firstOrNull { it.exists() } ?: return null
-        val content = modJson.readText()
+        val text = modJson.readText()
 
-        val minecraftDep = Regex(""""minecraft"\s*:\s*"([^"]+)"""").find(content)?.groupValues?.get(1) ?: return null
-        val versionPattern = Regex("""\d+\.\d+(?:\.\d+)?""")
-        val found = versionPattern.findAll(minecraftDep).map { it.value }.toList()
+        val minecraftDep = Regex(""""minecraft"\s*:\s*"([^"]+)"""").find(text)?.groupValues?.get(1) ?: return null
 
-        return found.maxWithOrNull(compareBy {
+        val versionComparator = compareBy<String> {
             it.split(".").map { p -> p.toIntOrNull() ?: 0 }
                 .let { parts -> parts.getOrElse(0) { 0 } * 10_000 + parts.getOrElse(1) { 0 } * 100 + parts.getOrElse(2) { 0 } }
-        })
+        }
+
+        val found = Regex("""\d+\.\d+(?:\.\d+)?""").findAll(minecraftDep).map { it.value }.toList()
+
+        return if (bumpUp) found.maxWithOrNull(versionComparator) else found.minWithOrNull(versionComparator)
     }
 
     fun buildPlan(projectDir: File, oldVersion: String, newVersions: Versions): BumpPlan {

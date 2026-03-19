@@ -13,7 +13,7 @@ import java.awt.*;
 
 public class ModConfig {
     public static ConfigClassHandler<ModConfig> INSTANCE = ConfigClassHandler.createBuilder(ModConfig.class)
-            .id(ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "config"))
+            .id(new ResourceLocation(AnimatedMojangLogoClient.MOD_ID, "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("animated-mojang-logo.json")).build()).build();
 

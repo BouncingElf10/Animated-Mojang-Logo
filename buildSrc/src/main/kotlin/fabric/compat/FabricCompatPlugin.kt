@@ -108,15 +108,22 @@ class FabricCompatPlugin : Plugin<Project> {
                 println("${Ansi.BOLD}Minecraft Version Bump${Ansi.RESET}")
                 println()
 
-                val currentTarget =
-                    VersionBumper.resolveCurrentTargetVersion(projectDir) ?: FabricMeta.getCurrentVersion(projectDir)
+                val currentTarget = VersionBumper.resolveCurrentTargetVersion(projectDir, config.bumpUp) ?: FabricMeta.getCurrentVersion(projectDir)
 
                 println("  Current target version: ${Ansi.BOLD}$currentTarget${Ansi.RESET}")
 
-                val nextVersion = runBlocking { FabricMeta.getNextStableVersionAfter(currentTarget) } ?: run {
-                    println("  ${Ansi.RED}No newer stable Minecraft version found - you're already on the latest.${Ansi.RESET}")
-                    println()
-                    return@doLast
+                val nextVersion = if (config.bumpUp) {
+                    runBlocking { FabricMeta.getNextStableVersionAfter(currentTarget) } ?: run {
+                        println("  ${Ansi.RED}No newer stable Minecraft version found - you're already on the latest.${Ansi.RESET}")
+                        println()
+                        return@doLast
+                    }
+                } else {
+                    runBlocking { FabricMeta.getPrevStableVersionAfter(currentTarget) } ?: run {
+                        println("  ${Ansi.RED}No older stable Minecraft version found - you're already on the latest.${Ansi.RESET}")
+                        println()
+                        return@doLast
+                    }
                 }
 
                 println("  Next version found:     ${Ansi.BOLD}${Ansi.GREEN}$nextVersion${Ansi.RESET}")

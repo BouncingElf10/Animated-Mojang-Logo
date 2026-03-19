@@ -84,7 +84,7 @@ public class MojangAnimFrameManager {
         int studiosX = guiGraphics.guiWidth() / 2 - studiosWidth / 2;
         int studiosY = logoY + logoHeight - 25;
 
-        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
+        ResourceLocation frameLocation = new ResourceLocation(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -104,7 +104,7 @@ public class MojangAnimFrameManager {
         int x = guiGraphics.guiWidth() / 2 - renderWidth / 2;
         int y = (guiGraphics.guiHeight() - 28) / 2 - renderHeight / 2;
 
-        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
+        ResourceLocation frameLocation = new ResourceLocation(AnimatedMojangLogoClient.MOD_ID,
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
 
         RenderSystem.enableBlend();

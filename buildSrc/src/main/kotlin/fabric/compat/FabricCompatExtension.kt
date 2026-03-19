@@ -65,4 +65,10 @@ open class FabricCompatExtension {
      * Default: false — only failures print a tail of their output.
      */
     var verbose: Boolean = false
+
+    /**
+     * If true, the next version will bump up the version of the mod, if false, it will bump down.
+     * Default: true
+     */
+    var bumpUp: Boolean = true
 }
