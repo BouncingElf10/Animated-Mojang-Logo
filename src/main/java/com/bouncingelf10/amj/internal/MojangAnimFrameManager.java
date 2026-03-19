@@ -3,12 +3,12 @@ package com.bouncingelf10.amj.internal;
 import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.sound.ModSounds;
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.bouncingelf10.timelesslib.TimelessLibClient;
 import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
@@ -88,7 +88,7 @@ public class MojangAnimFrameManager {
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
         int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderType::guiTextured, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
+        guiGraphics.blit(RenderPipelines.MOJANG_LOGO, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
     }
 
     public static void renderLogo(GuiGraphics guiGraphics) {
@@ -105,7 +105,7 @@ public class MojangAnimFrameManager {
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
         int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderType::guiTextured, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
+        guiGraphics.blit(RenderPipelines.MOJANG_LOGO, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
     }
 
     public static void stop() {
