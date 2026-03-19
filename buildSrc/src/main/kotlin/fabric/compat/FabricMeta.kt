@@ -29,12 +29,7 @@ object FabricMeta {
     private var loomVersionCache: String? = null
 
     fun getCurrentVersion(projectDir: File): String = readGradleProperty(projectDir, "minecraft_version") ?: error(
-        "minecraft_version not found in ${
-            File(
-                projectDir,
-                "gradle.properties"
-            ).absolutePath
-        }"
+        "minecraft_version not found in ${File(projectDir, "gradle.properties").absolutePath}"
     )
 
     fun getLoomVersionFromProperties(projectDir: File): String? = readGradleProperty(projectDir, "loom_version")
@@ -52,6 +47,12 @@ object FabricMeta {
     }
 
     suspend fun getAllStableVersions(): List<MinecraftVersion> = getStableVersionList()
+
+    suspend fun getNextStableVersionAfter(version: String): String? {
+        val list = getStableVersionList()
+        val idx = list.indexOfFirst { it.version == version }
+        return if (idx > 0) list[idx - 1].version else null
+    }
 
     suspend fun prewarmLoader(overrideVersion: String? = null, projectDir: File? = null) {
         if (overrideVersion != null) {
