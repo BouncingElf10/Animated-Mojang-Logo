@@ -52,30 +52,6 @@ public class LoadingOverlayMixin {
 	}
 
 	@Unique
-    private static void debugRenderLogo(GuiGraphics guiGraphics) {
-		int w = guiGraphics.guiWidth();
-		int h = guiGraphics.guiHeight();
-		int centerX = w / 2;
-		int centerY = h / 2;
-		double logoHeight = Math.min(w * 0.75, h) * 0.25;
-		int halfHeight = (int)(logoHeight * 0.5);
-		double logoWidth = logoHeight * 4.0;
-		int halfWidth = (int)(logoWidth * 0.5);
-		RenderSystem.disableDepthTest();
-		RenderSystem.depthMask(false);
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		guiGraphics.setColor(1f, 1f, 1f, 1f);
-		ResourceLocation MOJANG_STUDIOS_LOGO_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/title/mojangstudios.png");
-		guiGraphics.blit(MOJANG_STUDIOS_LOGO_LOCATION, centerX - halfWidth, centerY - halfHeight, halfWidth, (int)logoHeight, -0.0625F, 0F, 120, 60, 120, 120);
-		guiGraphics.blit(MOJANG_STUDIOS_LOGO_LOCATION, centerX, centerY - halfHeight, halfWidth, (int)logoHeight, 0.0625F, 60F, 120, 60, 120, 120);
-		guiGraphics.setColor(1f, 1f, 1f, 1f);
-		RenderSystem.disableBlend();
-		RenderSystem.depthMask(true);
-		RenderSystem.enableDepthTest();
-	}
-
-	@Unique
     private void renderMojangAnim(GuiGraphics guiGraphics) {
 		if (!MojangAnimFrameManager.hasStarted) {
 			MojangAnimFrameManager.start();
