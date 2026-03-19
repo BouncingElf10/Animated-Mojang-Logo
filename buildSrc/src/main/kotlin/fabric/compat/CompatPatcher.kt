@@ -16,7 +16,7 @@ object CompatPatcher {
 
     fun backupDir(projectDir: File): File = File(projectDir, ".gradle/compat-backups")
 
-    private fun writeBackup(projectDir: File, file: File, content: String) {
+    fun writeBackup(projectDir: File, file: File, content: String) {
         File(backupDir(projectDir).also { it.mkdirs() }, file.name + ".bak").writeText(content)
     }
 
