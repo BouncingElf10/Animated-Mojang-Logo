@@ -73,8 +73,11 @@ publishMods {
         requires("modmenu")
         requires("timelesslib")
 
-        minecraftVersions.add("1.20.5")
-        minecraftVersions.add("1.20.6")
+        minecraftVersions.add("1.20")
+        minecraftVersions.add("1.20.1")
+        minecraftVersions.add("1.20.2")
+        minecraftVersions.add("1.20.3")
+        minecraftVersions.add("1.20.4")
     }
 
     curseforge {
@@ -82,8 +85,11 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         requires("yacl", "modmenu", "timelesslib")
 
-        minecraftVersions.add("1.20.5")
-        minecraftVersions.add("1.20.6")
+        minecraftVersions.add("1.20")
+        minecraftVersions.add("1.20.1")
+        minecraftVersions.add("1.20.2")
+        minecraftVersions.add("1.20.3")
+        minecraftVersions.add("1.20.4")
     }
 }
 
@@ -96,7 +102,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 17
 }
 
 java {
@@ -105,8 +111,8 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
