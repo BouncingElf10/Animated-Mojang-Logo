@@ -66,7 +66,7 @@ public class LoadingOverlayMixin {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		guiGraphics.setColor(1f, 1f, 1f, 1f);
-		ResourceLocation MOJANG_STUDIOS_LOGO_LOCATION = ResourceLocation.withDefaultNamespace("textures/gui/title/mojangstudios.png");
+		ResourceLocation MOJANG_STUDIOS_LOGO_LOCATION = new ResourceLocation("textures/gui/title/mojangstudios.png");
 		guiGraphics.blit(MOJANG_STUDIOS_LOGO_LOCATION, centerX - halfWidth, centerY - halfHeight, halfWidth, (int)logoHeight, -0.0625F, 0F, 120, 60, 120, 120);
 		guiGraphics.blit(MOJANG_STUDIOS_LOGO_LOCATION, centerX, centerY - halfHeight, halfWidth, (int)logoHeight, 0.0625F, 60F, 120, 60, 120, 120);
 		guiGraphics.setColor(1f, 1f, 1f, 1f);

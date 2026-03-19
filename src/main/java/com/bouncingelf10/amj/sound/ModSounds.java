@@ -10,7 +10,7 @@ public class ModSounds {
     public static final SoundEvent STARTUP = register("startup");
 
     private static SoundEvent register(String id) {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, id);
+        ResourceLocation location = new ResourceLocation(AnimatedMojangLogoClient.MOD_ID, id);
         Registry.register(BuiltInRegistries.SOUND_EVENT, location, SoundEvent.createVariableRangeEvent(location));
         return SoundEvent.createVariableRangeEvent(location);
     }
