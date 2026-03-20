@@ -4,16 +4,15 @@ import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.sound.ModSounds;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.bouncingelf10.timelesslib.TimelessLibClient;
 import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
-
-import java.util.Vector;
 
 public class MojangAnimFrameManager {
     public static final AnimationTimeline timeline = TimelessLibClient.getClientAnimationManager().createTimeline("mojang_logo");
@@ -27,15 +26,15 @@ public class MojangAnimFrameManager {
 
     public static final int FRAMES = 79;
     public static final int FPS = 25;
-    public static final int LOGO_IMAGE_WIDTH = 1200 * 4;
+    public static final int LOGO_IMAGE_WIDTH  = 1200 * 4;
     public static final int LOGO_IMAGE_HEIGHT = 257 * 4;
 
-    public static final int STUDIOS_IMAGE_WIDTH = 560 * 4;
+    public static final int STUDIOS_IMAGE_WIDTH  = 560 * 4;
     public static final int STUDIOS_IMAGE_HEIGHT = 90 * 4;
 
     public static void start() {
         hasStarted = true;
-        float animDuration = (float) (FRAMES / FPS); // seconds
+        float animDuration = (float)(FRAMES / FPS);
 
         timeline.channelDouble("opacity_logo")
                 .keyframe(0, 0)
@@ -62,26 +61,26 @@ public class MojangAnimFrameManager {
 
         AnimatedMojangLogoClient.LOGGER.info("Playing sound and starting Mojang logo animation");
         Minecraft.getInstance().getSoundManager().play(
-            SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f)
+                SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f)
         );
     }
 
-    public static void render(GuiGraphics guiGraphics) {
-        renderLogo(guiGraphics);
-        renderStudios(guiGraphics);
+    public static void render(PoseStack poseStack, int w, int h) {
+        renderLogo(poseStack, w, h);
+        renderStudios(poseStack, w, h);
     }
 
-    public static void renderStudios(GuiGraphics guiGraphics) {
-        double logoScale = Math.min(guiGraphics.guiWidth() * 0.75, guiGraphics.guiHeight()) * 0.3;
+    public static void renderStudios(PoseStack poseStack, int w, int h) {
+        double logoScale = Math.min(w * 0.75, h) * 0.3;
         int logoHeight = (int) logoScale;
-        int logoY = guiGraphics.guiHeight() / 2 - logoHeight / 2;
+        int logoY = h / 2 - logoHeight / 2;
 
         double studiosScale = logoHeight * 0.3;
         float studiosAspect = (float) STUDIOS_IMAGE_WIDTH / STUDIOS_IMAGE_HEIGHT;
         int studiosHeight = (int) studiosScale;
         int studiosWidth = (int)(studiosHeight * studiosAspect);
 
-        int studiosX = guiGraphics.guiWidth() / 2 - studiosWidth / 2;
+        int studiosX = w / 2 - studiosWidth / 2;
         int studiosY = logoY + logoHeight - 25;
 
         ResourceLocation frameLocation = new ResourceLocation(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
@@ -89,20 +88,21 @@ public class MojangAnimFrameManager {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
-        guiGraphics.setColor(color.x, color.y, color.z, opacityStudios);
-        guiGraphics.blit(frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(color.x, color.y, color.z, opacityStudios);
+        RenderSystem.setShaderTexture(0, frameLocation);
+        GuiComponent.blit(poseStack, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableBlend();
     }
 
-    public static void renderLogo(GuiGraphics guiGraphics) {
-        double logoScale = Math.min(guiGraphics.guiWidth() * 0.75, guiGraphics.guiHeight()) * 0.24;
+    public static void renderLogo(PoseStack poseStack, int w, int h) {
+        double logoScale = Math.min(w * 0.75, h) * 0.24;
         float aspect = (float) LOGO_IMAGE_WIDTH / (float) LOGO_IMAGE_HEIGHT;
         int renderHeight = (int) logoScale;
-        int renderWidth = (int) (renderHeight * aspect);
+        int renderWidth = (int)(renderHeight * aspect);
 
-        int x = guiGraphics.guiWidth() / 2 - renderWidth / 2;
-        int y = (guiGraphics.guiHeight() - 28) / 2 - renderHeight / 2;
+        int x = w / 2 - renderWidth / 2;
+        int y = (h - 28) / 2 - renderHeight / 2;
 
         ResourceLocation frameLocation = new ResourceLocation(AnimatedMojangLogoClient.MOD_ID,
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
@@ -110,9 +110,10 @@ public class MojangAnimFrameManager {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
-        guiGraphics.setColor(color.x, color.y, color.z, opacityLogo);
-        guiGraphics.blit(frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(color.x, color.y, color.z, opacityLogo);
+        RenderSystem.setShaderTexture(0, frameLocation);
+        GuiComponent.blit(poseStack, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableBlend();
     }
 

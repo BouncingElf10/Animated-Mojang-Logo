@@ -18,6 +18,5 @@ public class AnimatedMojangLogoClient implements ClientModInitializer {
 		LOGGER.info("Initializing Animated Mojang Logo");
 		isInit = true;
 		ModSounds.initialize();
-		ModConfig.load();
 	}
 }
