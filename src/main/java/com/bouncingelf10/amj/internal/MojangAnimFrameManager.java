@@ -5,6 +5,7 @@ import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.sound.ModSounds;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import dev.bouncingelf10.timelesslib.TimelessLibClient;
 import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
@@ -12,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector3f;
 
 public class MojangAnimFrameManager {
     public static final AnimationTimeline timeline = TimelessLibClient.getClientAnimationManager().createTimeline("mojang_logo");
@@ -88,7 +88,7 @@ public class MojangAnimFrameManager {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
-        RenderSystem.setShaderColor(color.x, color.y, color.z, opacityStudios);
+        RenderSystem.setShaderColor(color.x(), color.y(), color.z(), opacityStudios);
         RenderSystem.setShaderTexture(0, frameLocation);
         GuiComponent.blit(poseStack, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -110,7 +110,7 @@ public class MojangAnimFrameManager {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
-        RenderSystem.setShaderColor(color.x, color.y, color.z, opacityLogo);
+        RenderSystem.setShaderColor(color.x(), color.y(), color.z(), opacityLogo);
         RenderSystem.setShaderTexture(0, frameLocation);
         GuiComponent.blit(poseStack, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

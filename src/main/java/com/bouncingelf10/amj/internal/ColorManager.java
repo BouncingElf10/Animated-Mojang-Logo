@@ -1,10 +1,9 @@
 package com.bouncingelf10.amj.internal;
 
 import com.bouncingelf10.amj.config.ModConfig;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.FastColor;
-import org.joml.Vector3f;
-import org.spongepowered.asm.mixin.Unique;
 
 import java.awt.*;
 import java.util.function.IntSupplier;
@@ -79,6 +78,6 @@ public class ColorManager {
 
     public static Color hexToColor(String hex) {
         Vector3f color = getColorVec(getColor(hex));
-        return new Color(color.x, color.y, color.z);
+        return new Color(color.x(), color.y(), color.z());
     }
 }
