@@ -71,11 +71,7 @@ publishMods {
         requires("modmenu")
         requires("timelesslib")
 
-        minecraftVersions.add("1.21.6")
-        minecraftVersions.add("1.21.7")
-        minecraftVersions.add("1.21.8")
-        minecraftVersions.add("1.21.9")
-        minecraftVersions.add("1.21.10")
+        minecraftVersions.add("1.21.11")
     }
 
     curseforge {
@@ -83,11 +79,7 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         requires("yacl", "modmenu", "timelesslib")
 
-        minecraftVersions.add("1.21.6")
-        minecraftVersions.add("1.21.7")
-        minecraftVersions.add("1.21.8")
-        minecraftVersions.add("1.21.9")
-        minecraftVersions.add("1.21.10")
+        minecraftVersions.add("1.21.11")
     }
 }
 
