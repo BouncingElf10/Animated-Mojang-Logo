@@ -27,9 +27,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.16.5",
-    "minecraft": "*",
+    "minecraft": ">=1.19 <=1.19.2",
     "java": ">=21",
-    "timelesslib": "*",
-    "fabric-api": "*"
+    "timelesslib": "*"
   }
 }
