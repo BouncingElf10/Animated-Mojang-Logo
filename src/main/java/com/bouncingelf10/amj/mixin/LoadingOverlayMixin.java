@@ -124,21 +124,21 @@ public class LoadingOverlayMixin {
 		);
 	}
 
-	@Unique
-	private void drawProgressBar(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, float alpha, float progress) {
-		int width = x2 - x1;
-		int filled = Mth.ceil((width - 2) * progress);
-		int barColor = ColorManager.applyAlpha(ColorManager.getBar(), alpha);
-		int backgroundColor = ColorManager.applyAlpha(ColorManager.getBarBackground(), alpha);
-		int borderColor = ColorManager.applyAlpha(ColorManager.getBorder(), alpha);
+    @Unique
+    private void drawProgressBar(GuiGraphics guiGraphics, int x1, int y1, int x2, int y2, float alpha, float progress) {
+        int width = x2 - x1;
+        int filled = Math.min(Mth.ceil((width - 2) * progress), width - 4);
+        int barColor = ColorManager.applyAlpha(ColorManager.getBar(), alpha);
+        int backgroundColor = ColorManager.applyAlpha(ColorManager.getBarBackground(), alpha);
+        int borderColor = ColorManager.applyAlpha(ColorManager.getBorder(), alpha);
 
-		guiGraphics.fill(x1, y1, x2, y1 + 1, borderColor);
-		guiGraphics.fill(x1, y2 - 1, x2, y2, borderColor);
-		guiGraphics.fill(x1, y1, x1 + 1, y2, borderColor);
-		guiGraphics.fill(x2 - 1, y1, x2, y2, borderColor);
-		guiGraphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, backgroundColor);
-		guiGraphics.fill(x1 + 2, y1 + 2, x1 + 2 + filled, y2 - 2, barColor);
-	}
+        guiGraphics.fill(x1 + 1, y1, x2 - 1, y1 + 1, borderColor);
+        guiGraphics.fill(x1 + 1, y2 - 1, x2 - 1, y2, borderColor);
+        guiGraphics.fill(x1, y1, x1 + 1, y2, borderColor);
+        guiGraphics.fill(x2 - 1, y1, x2, y2, borderColor);
+        guiGraphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, backgroundColor);
+        guiGraphics.fill(x1 + 2, y1 + 2, x1 + 2 + filled, y2 - 2, barColor);
+    }
 
 	@Unique
 	private void removeOverlay(LoadingOverlayAccessor self) {
