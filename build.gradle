@@ -61,7 +61,7 @@ fabricCompat {
 
 publishMods {
     file = tasks.remapJar.archiveFile
-    changelog = "Major rewrite with smoother animation and higher resolution textures"
+    changelog = "Fixed bug where progress bar overlapped at corners"
     type = STABLE
     modLoaders.add("fabric")
 
