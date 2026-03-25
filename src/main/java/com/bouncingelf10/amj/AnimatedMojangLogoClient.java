@@ -28,7 +28,7 @@ public class AnimatedMojangLogoClient {
     public AnimatedMojangLogoClient(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Initializing Animated Mojang Logo");
 
-        isInit = false;
+        isInit = true;
 
         ModSounds.register(modEventBus);
         ModConfig.load();

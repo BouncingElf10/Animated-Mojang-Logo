@@ -10,7 +10,8 @@
     "requireAnnotations": true
   },
   "client": [
-    "LoadingOverlayAccessor",
-    "LoadingOverlayMixin"
+    "NeoForgeLoadingOverlayAccessor",
+    "NeoForgeLoadingOverlayMixin",
+    "TimelessMixin"
   ]
 }
