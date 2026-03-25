@@ -8,5 +8,9 @@
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "client": [
+    "LoadingOverlayAccessor",
+    "LoadingOverlayMixin"
+  ]
 }
