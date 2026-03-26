@@ -3,6 +3,9 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.140'
     id 'idea'
+
+    id("me.modmuss50.mod-publish-plugin") version "0.8.1"
+    id("fabric.compat")
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -145,6 +148,33 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     implementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+}
+
+publishMods {
+    file = tasks.jar.archiveFile
+    changelog = "Neoforge port"
+    type = STABLE
+    modLoaders.add("neoforge")
+
+    modrinth {
+        projectId = "dWUOweyL"
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        requires("yacl")
+        requires("modmenu")
+        requires("timelesslib")
+
+        minecraftVersions.add("1.21")
+        minecraftVersions.add("1.21.1")
+    }
+
+    curseforge {
+        projectId = "1253070"
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        requires("yacl", "modmenu", "timelesslib")
+
+        minecraftVersions.add("1.21")
+        minecraftVersions.add("1.21.1")
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
