@@ -2,15 +2,15 @@ package com.bouncingelf10.amj.internal;
 
 import com.bouncingelf10.amj.config.ModConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.function.IntSupplier;
 
 public class ColorManager {
-    private static final int LOGO_BACKGROUND_COLOR = FastColor.ARGB32.color(255, 239, 50, 61);
-    private static final int LOGO_BACKGROUND_COLOR_DARK = FastColor.ARGB32.color(255, 0, 0, 0);
+    private static final int LOGO_BACKGROUND_COLOR = ARGB.color(255, 239, 50, 61);
+    private static final int LOGO_BACKGROUND_COLOR_DARK = ARGB.color(255, 0, 0, 0);
     private static final IntSupplier BRAND_BACKGROUND = () ->
             (Boolean) Minecraft.getInstance().options.darkMojangStudiosBackground().get()
                     ? LOGO_BACKGROUND_COLOR_DARK
@@ -52,11 +52,11 @@ public class ColorManager {
         int r = (rgb >> 16) & 0xFF;
         int g = (rgb >> 8) & 0xFF;
         int b = rgb & 0xFF;
-        return FastColor.ARGB32.color(255, r, g, b);
+        return ARGB.color(255, r, g, b);
     }
 
     public static int getColor(Color color) {
-        return FastColor.ARGB32.color(255, color.getRed(), color.getGreen(), color.getBlue());
+        return ARGB.color(255, color.getRed(), color.getGreen(), color.getBlue());
     }
 
     public static int applyAlpha(int color, float alpha) {
@@ -64,7 +64,7 @@ public class ColorManager {
         int r = (color >> 16) & 255;
         int g = (color >> 8) & 255;
         int b = color & 255;
-        return FastColor.ARGB32.color(a, r, g, b);
+        return ARGB.color(a, r, g, b);
     }
 
     public static Vector3f getColorVec(int color) {
