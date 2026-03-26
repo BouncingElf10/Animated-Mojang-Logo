@@ -8,8 +8,10 @@ import com.bouncingelf10.amj.timelesslib.animation.AnimationTimeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
 public class MojangAnimFrameManager {
@@ -76,20 +78,20 @@ public class MojangAnimFrameManager {
         double studiosScale = logoHeight * 0.3;
         float studiosAspect = (float) STUDIOS_IMAGE_WIDTH / STUDIOS_IMAGE_HEIGHT;
         int studiosHeight = (int) studiosScale;
-        int studiosWidth = (int) (studiosHeight * studiosAspect);
+        int studiosWidth = (int)(studiosHeight * studiosAspect);
 
         int studiosX = guiGraphics.guiWidth() / 2 - studiosWidth / 2;
         int studiosY = logoY + logoHeight - 25;
 
-        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(
-                AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
+        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
-        guiGraphics.setColor(color.x, color.y, color.z, opacityStudios);
-        guiGraphics.blit(frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
+        guiGraphics.blit(RenderType::guiTextured, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
+
         RenderSystem.disableBlend();
     }
 
@@ -102,16 +104,16 @@ public class MojangAnimFrameManager {
         int x = guiGraphics.guiWidth() / 2 - renderWidth / 2;
         int y = (guiGraphics.guiHeight() - 28) / 2 - renderHeight / 2;
 
-        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(
-                AnimatedMojangLogoClient.MOD_ID,
+        ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
-        guiGraphics.setColor(color.x, color.y, color.z, opacityLogo);
-        guiGraphics.blit(frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight);
-        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
+        guiGraphics.blit(RenderType::guiTextured, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
+
         RenderSystem.disableBlend();
     }
 

@@ -35,6 +35,13 @@ repositories {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
+    maven {
+        url = "https://thedarkcolour.github.io/KotlinForForge/"
+    }
+
+    maven {
+        url = "https://maven.neoforged.net/releases"
+    }
 }
 
 base {

@@ -22,14 +22,14 @@ side = "BOTH"
 [[dependencies.animatedmojanglogo]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,1.21.1]"
+versionRange = "[1.21,1.21.7]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.animatedmojanglogo]]
 modId = "yet_another_config_lib_v3"
 type = "required"
-versionRange = "[3.6.6,)"
+versionRange = "[3.6.1,)"
 ordering = "NONE"
 side = "CLIENT"
 
