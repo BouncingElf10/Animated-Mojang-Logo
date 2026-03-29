@@ -33,7 +33,6 @@ public class LoadingOverlayMixin {
 
 		if (!MojangAnimFrameManager.hasFinished && self.getFadeOutStart() != -1L) {
 			fadeOut = 0.0F;
-			self.setFadeOutStart(now);
 		}
 
 		if (fadeOut >= 1.0F) {
