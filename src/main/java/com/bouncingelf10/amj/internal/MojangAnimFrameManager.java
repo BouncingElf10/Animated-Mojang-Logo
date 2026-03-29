@@ -7,7 +7,7 @@ import dev.bouncingelf10.timelesslib.TimelessLibClient;
 import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
@@ -65,12 +65,12 @@ public class MojangAnimFrameManager {
         );
     }
 
-    public static void render(GuiGraphics guiGraphics) {
+    public static void render(GuiGraphicsExtractor guiGraphics) {
         renderLogo(guiGraphics);
         renderStudios(guiGraphics);
     }
 
-    public static void renderStudios(GuiGraphics guiGraphics) {
+    public static void renderStudios(GuiGraphicsExtractor guiGraphics) {
         double logoScale = Math.min(guiGraphics.guiWidth() * 0.75, guiGraphics.guiHeight()) * 0.3;
         int logoHeight = (int) logoScale;
         int logoY = guiGraphics.guiHeight() / 2 - logoHeight / 2;
@@ -87,10 +87,10 @@ public class MojangAnimFrameManager {
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
         int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.MOJANG_LOGO, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
     }
 
-    public static void renderLogo(GuiGraphics guiGraphics) {
+    public static void renderLogo(GuiGraphicsExtractor guiGraphics) {
         double logoScale = Math.min(guiGraphics.guiWidth() * 0.75, guiGraphics.guiHeight()) * 0.24;
         float aspect = (float) LOGO_IMAGE_WIDTH / (float) LOGO_IMAGE_HEIGHT;
         int renderHeight = (int) logoScale;
@@ -104,7 +104,7 @@ public class MojangAnimFrameManager {
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
         int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.MOJANG_LOGO, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
     }
 
     public static void stop() {

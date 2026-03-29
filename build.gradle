@@ -1,8 +1,7 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
     id("me.modmuss50.mod-publish-plugin") version "0.8.1"
-
     id("com.bouncingelf10.minecraft-version-compatibility-checker") version "1.7.0"
 }
 
@@ -14,43 +13,23 @@ base {
 }
 
 repositories {
-    // Add repositories to retrieve artifacts from in here.
-    // You should only use this when depending on other mods because
-    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-    // for more information about repositories.
     mavenCentral()
-
-    maven {
-        url = "https://maven.fabricmc.net/"
-    }
-
-    maven {
-        url = "https://maven.terraformersmc.com/"
-    }
-
+    maven { url = "https://maven.terraformersmc.com/" }
     maven {
         name 'Xander Maven'
         url 'https://maven.isxander.dev/releases'
     }
-
-    maven {
-        url = "https://api.modrinth.com/maven"
-    }
+    maven { url = "https://api.modrinth.com/maven" }
 }
 
 dependencies {
-    // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
-    modImplementation "maven.modrinth:timelesslib:${project.timelesslib_version}"
+    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    implementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    implementation "maven.modrinth:timelesslib:${project.timelesslib_version}"
 }
 
 minecraftCompat {
@@ -59,7 +38,7 @@ minecraftCompat {
 }
 
 publishMods {
-    file = tasks.remapJar.archiveFile
+    file = tasks.jar.archiveFile
     changelog = "Fixed bug where progress bar overlapped at corners"
     type = STABLE
     modLoaders.add("fabric")
@@ -70,22 +49,19 @@ publishMods {
         requires("yacl")
         requires("modmenu")
         requires("timelesslib")
-
-        minecraftVersions.add("1.21.11")
+        minecraftVersions.add("26.1")
     }
 
     curseforge {
         projectId = "1253070"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         requires("yacl", "modmenu", "timelesslib")
-
-        minecraftVersions.add("1.21.11")
+        minecraftVersions.add("26.1")
     }
 }
 
 processResources {
     inputs.property "version", project.version
-
     filesMatching("fabric.mod.json") {
         expand "version": inputs.properties.version
     }
@@ -96,37 +72,23 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
     withSourcesJar()
-
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
     inputs.property "archivesName", project.base.archivesName
-
     from("LICENSE") {
-        rename { "${it}_${inputs.properties.archivesName}"}
+        rename { "${it}_${inputs.properties.archivesName}" }
     }
 }
 
-// configure the maven publication
 publishing {
     publications {
         create("mavenJava", MavenPublication) {
             artifactId = project.archives_base_name
             from components.java
         }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
     }
 }
