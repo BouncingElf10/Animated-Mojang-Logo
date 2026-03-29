@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id("me.modmuss50.mod-publish-plugin") version "0.8.1"
 
-    id("fabric.compat")
+    id("com.bouncingelf10.minecraft-version-compatibility-checker") version "1.7.0"
 }
 
 version = project.mod_version
@@ -53,9 +53,9 @@ dependencies {
     modImplementation "maven.modrinth:timelesslib:${project.timelesslib_version}"
 }
 
-fabricCompat {
+minecraftCompat {
     maxStrikes = 3
-    checkOlderVersions = false  
+    bumpUp = true
 }
 
 publishMods {
@@ -92,7 +92,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
@@ -101,8 +101,8 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
