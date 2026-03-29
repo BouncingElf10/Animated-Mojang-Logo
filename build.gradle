@@ -2,6 +2,7 @@ plugins {
     id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
     id("me.modmuss50.mod-publish-plugin") version "0.8.1"
+
     id("com.bouncingelf10.minecraft-version-compatibility-checker") version "1.7.0"
 }
 
@@ -39,8 +40,8 @@ minecraftCompat {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Fixed bug where progress bar overlapped at corners"
-    type = STABLE
+    changelog = "26.1 port"
+    type = BETA
     modLoaders.add("fabric")
 
     modrinth {
