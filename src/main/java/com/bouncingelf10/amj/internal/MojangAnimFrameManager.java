@@ -88,7 +88,7 @@ public class MojangAnimFrameManager {
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
         int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.MOJANG_LOGO, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
     }
 
     public static void renderLogo(GuiGraphics guiGraphics) {
@@ -105,7 +105,7 @@ public class MojangAnimFrameManager {
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
         int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.MOJANG_LOGO, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
     }
 
     public static void stop() {
