@@ -41,7 +41,7 @@ minecraftCompat {
 publishMods {
     file = tasks.jar.archiveFile
     changelog = "26.1 port"
-    type = BETA
+    type = STABLE
     modLoaders.add("fabric")
 
     modrinth {
