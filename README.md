@@ -11,7 +11,3 @@ This mod now has a custom config screen accessed by modmenu. You can configure t
 
 ## Why the Kotlin?
 I used Animated Mojang Logo as a sort of testing grounds for a [gradle plugin](https://github.com/BouncingElf10/MinecraftVersionCompatibilityChecker) I was working on, thus the Kotlin. This probably wasnt the best way to do this but its the way I did it. In no part is the actual mod written in Kotlin. 
-
----
-### Forge
-A forge port is in the works
