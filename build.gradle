@@ -40,7 +40,7 @@ minecraftCompat {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "26.1 port"
+    changelog = "26.1.2 port"
     type = STABLE
     modLoaders.add("fabric")
 
@@ -52,6 +52,7 @@ publishMods {
         requires("timelesslib")
         minecraftVersions.add("26.1")
         minecraftVersions.add("26.1.1")
+        minecraftVersions.add("26.1.2")
     }
 
     curseforge {
@@ -60,6 +61,7 @@ publishMods {
         requires("yacl", "modmenu", "timelesslib")
         minecraftVersions.add("26.1")
         minecraftVersions.add("26.1.1")
+        minecraftVersions.add("26.1.2")
     }
 }
 
