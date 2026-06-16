@@ -36,10 +36,10 @@ public class LoadingOverlayMixin {
 		}
 
 		if (fadeOut >= 1.0F) {
-			if (self.getMinecraft().screen != null) {
-				self.getMinecraft().screen.extractRenderStateWithTooltipAndSubtitles(graphics, 0, 0, delta);
+			if (self.getMinecraft().gui.screen() != null) {
+				self.getMinecraft().gui.screen().extractRenderStateWithTooltipAndSubtitles(graphics, 0, 0, delta);
 			} else {
-				self.getMinecraft().gui.extractDeferredSubtitles();
+				self.getMinecraft().gui.hud.extractDeferredSubtitles();
 			}
 			graphics.nextStratum();
 
@@ -132,7 +132,7 @@ public class LoadingOverlayMixin {
 
 	@Unique
 	private void removeOverlay(LoadingOverlayAccessor self) {
-		self.getMinecraft().setOverlay(null);
+		self.getMinecraft().gui.setOverlay(null);
 	}
 
 	@Unique
