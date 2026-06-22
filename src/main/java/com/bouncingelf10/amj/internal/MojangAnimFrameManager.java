@@ -1,8 +1,13 @@
 package com.bouncingelf10.amj.internal;
 
+import static java.util.Objects.requireNonNull;
+
+import org.joml.Vector3f;
+
 import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.sound.ModSounds;
+
 import dev.bouncingelf10.timelesslib.TimelessLibClient;
 import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
@@ -12,10 +17,10 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
-import org.joml.Vector3f;
 
 public class MojangAnimFrameManager {
-    public static final AnimationTimeline timeline = TimelessLibClient.getClientAnimationManager().createTimeline("mojang_logo");
+    public static final AnimationTimeline timeline = TimelessLibClient.getClientAnimationManager()
+            .createTimeline("mojang_logo");
     public static boolean hasStarted = false;
     public static boolean hasFinished = false;
     public static float opacityLogo = 0;
@@ -60,9 +65,8 @@ public class MojangAnimFrameManager {
         timeline.play();
 
         AnimatedMojangLogoClient.LOGGER.info("Playing sound and starting Mojang logo animation");
-        Minecraft.getInstance().getSoundManager().play(
-                SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f)
-        );
+        Minecraft.getInstance().getSoundManager()
+                .play(SimpleSoundInstance.forUI(requireNonNull(ModSounds.STARTUP, "Startup sound is null"), 1.0f));
     }
 
     public static void render(GuiGraphicsExtractor guiGraphics) {
@@ -78,16 +82,19 @@ public class MojangAnimFrameManager {
         double studiosScale = logoHeight * 0.3;
         float studiosAspect = (float) STUDIOS_IMAGE_WIDTH / STUDIOS_IMAGE_HEIGHT;
         int studiosHeight = (int) studiosScale;
-        int studiosWidth = (int)(studiosHeight * studiosAspect);
+        int studiosWidth = (int) (studiosHeight * studiosAspect);
 
         int studiosX = guiGraphics.guiWidth() / 2 - studiosWidth / 2;
         int studiosY = logoY + logoHeight - 25;
 
-        Identifier frameLocation = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
+        Identifier frameLocation = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
+                "textures/gui/studios.png");
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
-        int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
+        int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f),
+                Math.round(color.z * 255f));
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth,
+                studiosHeight, studiosWidth, studiosHeight, tint);
     }
 
     public static void renderLogo(GuiGraphicsExtractor guiGraphics) {
@@ -103,12 +110,15 @@ public class MojangAnimFrameManager {
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
-        int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
+        int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f),
+                Math.round(color.z * 255f));
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight,
+                renderWidth, renderHeight, tint);
     }
 
     public static void stop() {
-        if (!hasStarted) return;
+        if (!hasStarted)
+            return;
 
         timeline.stop();
 
