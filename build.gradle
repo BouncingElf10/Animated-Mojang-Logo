@@ -40,7 +40,7 @@ minecraftCompat {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "26.1.2 port"
+    changelog = "Updated TimelessLib dependency to ${project.timelesslib_version}"
     type = STABLE
     modLoaders.add("fabric")
 
