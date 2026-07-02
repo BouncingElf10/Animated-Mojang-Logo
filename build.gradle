@@ -60,7 +60,7 @@ fabricCompat {
 
 publishMods {
     file = tasks.remapJar.archiveFile
-    changelog = "Fixed bug where logo would appear blown out"
+    changelog = "Updated TimelessLib dependency to ${project.timelesslib_version}"
     type = STABLE
     modLoaders.add("fabric")
 
