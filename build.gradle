@@ -62,7 +62,7 @@ fabricCompat {
 
 publishMods {
     file = tasks.remapJar.archiveFile
-    changelog = "Fixed bug where progress bar overlapped at corners"
+    changelog = "Updated TimelessLib dependency to ${project.timelesslib_version}"
     type = STABLE
     modLoaders.add("fabric")
 
