@@ -22,7 +22,7 @@ public class AnimatedMojangLogoClient {
     public static boolean isInit = false;
     public static boolean hasRunOnce = false;
 
-    public static final ClientCountdownManager<Minecraft> clientCountdownManager = new ClientCountdownManager<>(Minecraft::getInstance);
+    private static ClientCountdownManager<Minecraft> clientCountdownManager;
     public static final AnimationManager clientAnimationManager = new AnimationManager();
 
     public AnimatedMojangLogoClient(IEventBus modEventBus, ModContainer modContainer) {
@@ -40,6 +40,11 @@ public class AnimatedMojangLogoClient {
     }
 
     public static ClientCountdownManager<Minecraft> getClientCountdownManager() {
+        if (clientCountdownManager == null) {
+            // Constructed lazily: its constructor probes Minecraft.getInstance() immediately,
+            // which is still null during mod construction.
+            clientCountdownManager = new ClientCountdownManager<>(Minecraft::getInstance);
+        }
         return clientCountdownManager;
     }
     public static AnimationManager getClientAnimationManager() {
