@@ -16,7 +16,7 @@ import org.joml.Vector3f;
 import java.util.Vector;
 
 public class MojangAnimFrameManager {
-    public static final AnimationTimeline timeline = TimelessLibClient.getClientAnimationManager().createTimeline("mojang_logo");
+    public static final AnimationTimeline timeline = TimelessLibClient.animations().createTimeline(new ResourceLocation(AnimatedMojangLogoClient.MOD_ID, "mojang_logo"));
     public static boolean hasStarted = false;
     public static boolean hasFinished = false;
     public static float opacityLogo = 0;
@@ -56,7 +56,7 @@ public class MojangAnimFrameManager {
 
         timeline.onFinish(() -> {
             hasFinished = true;
-            TimelessLibClient.getClientScheduler().after(Duration.SECOND, client -> stop());
+            TimelessLibClient.scheduler().after(Duration.SECOND, client -> stop());
         });
         timeline.play();
 
