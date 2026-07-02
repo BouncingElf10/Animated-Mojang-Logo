@@ -32,22 +32,21 @@ public class NeoForgeLoadingOverlayMixin {
         NeoForgeLoadingOverlayAccessor self = (NeoForgeLoadingOverlayAccessor) this;
         long now = Util.getMillis();
 
-        float fadeOut = getFadeOutProgress(self, now);
-
+        tickFadeIn(self, now);
         smoothProgress(self);
+
+        float fadeOut = getFadeOutProgress(self, now);
+        float fadeIn = getFadeInProgress(self, now);
+
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ColorManager.getBackground());
         renderProgressBar(guiGraphics, self, fadeOut);
 
-
-        if (fadeOut >= 1.0F && AnimatedMojangLogoClient.isInit) {
+        if (fadeOut >= 2.0F && AnimatedMojangLogoClient.isInit) {
             renderMojangAnim(guiGraphics);
-
-            if (MojangAnimFrameManager.hasFinished) {
-                removeOverlay(self);
-            }
+            if (MojangAnimFrameManager.hasFinished) removeOverlay(self);
         }
 
-        if (self.getFadeOutStart() == -1L && self.getReload().isDone()) {
+        if (canFinish(self, fadeIn)) {
             finish(self, guiGraphics, now);
         }
     }
@@ -59,6 +58,12 @@ public class NeoForgeLoadingOverlayMixin {
         }
 
         MojangAnimFrameManager.render(guiGraphics);
+    }
+
+    @Unique
+    private void tickFadeIn(NeoForgeLoadingOverlayAccessor self, long now) {
+        if (self.getFadeIn() && self.getFadeInStart() == -1L)
+            self.setFadeInStart(now);
     }
 
     @Unique
@@ -74,6 +79,18 @@ public class NeoForgeLoadingOverlayMixin {
         return self.getFadeOutStart() > -1L
                 ? (float) (now - self.getFadeOutStart()) / 1000.0F
                 : -1.0F;
+    }
+
+    @Unique
+    private float getFadeInProgress(NeoForgeLoadingOverlayAccessor self, long now) {
+        return self.getFadeInStart() > -1L
+                ? (float) (now - self.getFadeInStart()) / 500.0F
+                : -1.0F;
+    }
+
+    @Unique
+    private boolean canFinish(NeoForgeLoadingOverlayAccessor self, float fadeIn) {
+        return self.getFadeOutStart() == -1L && self.getReload().isDone() && (!self.getFadeIn() || fadeIn >= 2.0F);
     }
 
     @Unique

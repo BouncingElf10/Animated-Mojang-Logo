@@ -15,21 +15,21 @@ Replaces the default Minecraft loading screen with the animated Mojang Studios i
 [[dependencies.animatedmojanglogo]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0,)"
+versionRange = "[21.10,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.animatedmojanglogo]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.4,1.21.4]"
+versionRange = "[1.21.10,1.21.10]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.animatedmojanglogo]]
 modId = "yet_another_config_lib_v3"
 type = "required"
-versionRange = "[3.6.1,)"
+versionRange = "[3.8.2,)"
 ordering = "NONE"
 side = "CLIENT"
 

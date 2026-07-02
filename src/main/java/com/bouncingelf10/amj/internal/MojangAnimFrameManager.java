@@ -5,10 +5,9 @@ import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.sound.ModSounds;
 import com.bouncingelf10.amj.timelesslib.Duration;
 import com.bouncingelf10.amj.timelesslib.animation.AnimationTimeline;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
@@ -85,14 +84,9 @@ public class MojangAnimFrameManager {
 
         ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
         int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderType::guiTextured, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
-
-        RenderSystem.disableBlend();
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
     }
 
     public static void renderLogo(GuiGraphics guiGraphics) {
@@ -107,14 +101,9 @@ public class MojangAnimFrameManager {
         ResourceLocation frameLocation = ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
         int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
-        guiGraphics.blit(RenderType::guiTextured, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
-
-        RenderSystem.disableBlend();
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
     }
 
     public static void stop() {
