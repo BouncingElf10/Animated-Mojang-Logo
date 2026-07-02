@@ -159,7 +159,7 @@ dependencies {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Neoforge port"
+    changelog = "Ported to 1.21.10, with the fade-in animation feature backported from Fabric"
     type = STABLE
     modLoaders.add("neoforge")
 
@@ -167,18 +167,16 @@ publishMods {
         projectId = "dWUOweyL"
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         requires("yacl")
-        requires("modmenu")
-        requires("timelesslib")
 
-        minecraftVersions.add("1.21.4")
+        minecraftVersions.add("1.21.10")
     }
 
     curseforge {
         projectId = "1253070"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-        requires("yacl", "modmenu", "timelesslib")
+        requires("yacl")
 
-        minecraftVersions.add("1.21.4")
+        minecraftVersions.add("1.21.10")
     }
 }
 

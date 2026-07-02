@@ -14,6 +14,14 @@ public interface NeoForgeLoadingOverlayAccessor {
     @Accessor long getFadeOutStart();
     @Accessor void setFadeOutStart(long value);
 
+    @Accessor("fadeIn")
+    boolean getFadeIn();
+
+    @Accessor("fadeInStart")
+    long getFadeInStart();
+    @Accessor("fadeInStart")
+    void setFadeInStart(long value);
+
     @Accessor float getCurrentProgress();
     @Accessor void setCurrentProgress(float value);
 
