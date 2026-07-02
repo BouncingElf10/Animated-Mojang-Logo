@@ -5,7 +5,6 @@ import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.internal.ColorManager;
 import com.bouncingelf10.amj.internal.MojangAnimFrameManager;
 
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
@@ -30,7 +29,7 @@ public class NeoForgeLoadingOverlayMixin {
         ci.cancel();
 
         NeoForgeLoadingOverlayAccessor self = (NeoForgeLoadingOverlayAccessor) this;
-        long now = Util.getMillis();
+        long now = System.currentTimeMillis();
 
         tickFadeIn(self, now);
         smoothProgress(self);
@@ -146,6 +145,6 @@ public class NeoForgeLoadingOverlayMixin {
         self.setFadeOutStart(now);
 
         if (self.getMinecraft().screen != null)
-            self.getMinecraft().screen.init(self.getMinecraft(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            self.getMinecraft().screen.init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
     }
 }

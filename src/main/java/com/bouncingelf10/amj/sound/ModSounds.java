@@ -2,7 +2,7 @@ package com.bouncingelf10.amj.sound;
 
 import com.bouncingelf10.amj.AnimatedMojangLogoClient;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -14,7 +14,7 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> STARTUP =
             SOUND_EVENTS.register("startup",
                     () -> SoundEvent.createVariableRangeEvent(
-                            ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "startup")));
+                            Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "startup")));
 
     public static void register(IEventBus modEventBus) {
         SOUND_EVENTS.register(modEventBus);

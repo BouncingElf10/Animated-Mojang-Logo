@@ -5,14 +5,14 @@ import com.bouncingelf10.amj.internal.ColorManager;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.loading.FMLPaths;
 
 import java.awt.*;
 
 public class ModConfig {
     public static ConfigClassHandler<ModConfig> INSTANCE = ConfigClassHandler.createBuilder(ModConfig.class)
-            .id(ResourceLocation.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "config"))
+            .id(Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FMLPaths.CONFIGDIR.get().resolve("animated-mojang-logo.json"))
                     .build())

@@ -159,7 +159,7 @@ dependencies {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Ported to 1.21.10, with the fade-in animation feature backported from Fabric"
+    changelog = "Ported to 1.21.11, with the fade-in animation feature backported from Fabric"
     type = STABLE
     modLoaders.add("neoforge")
 
@@ -168,7 +168,7 @@ publishMods {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         requires("yacl")
 
-        minecraftVersions.add("1.21.10")
+        minecraftVersions.add("1.21.11")
     }
 
     curseforge {
@@ -176,7 +176,7 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         requires("yacl")
 
-        minecraftVersions.add("1.21.10")
+        minecraftVersions.add("1.21.11")
     }
 }
 
