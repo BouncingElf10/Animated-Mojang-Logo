@@ -174,6 +174,8 @@ publishMods {
     curseforge {
         projectId = "1253070"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        clientRequired = true
+        serverRequired = false
         requires("yacl")
 
         minecraftVersions.add("1.21.10")
