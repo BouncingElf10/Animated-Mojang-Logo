@@ -30,6 +30,7 @@ public class LoadingOverlayMixin {
 
 		tickFadeIn(self, now);
 		smoothProgress(self);
+		MojangAnimFrameManager.tickPreload();
 
 		float fadeOut = getFadeOutProgress(self, now);
 		float fadeIn = getFadeInProgress(self, now);
