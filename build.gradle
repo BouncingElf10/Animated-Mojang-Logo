@@ -58,6 +58,8 @@ publishMods {
     curseforge {
         projectId = "1253070"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        clientRequired = true
+        serverRequired = false
         requires("yacl", "modmenu", "timelesslib")
         minecraftVersions.add("26.1")
         minecraftVersions.add("26.1.1")
