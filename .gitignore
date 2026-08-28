@@ -34,7 +34,9 @@ bin/
 
 ### Minecraft Modding ###
 run/
-!**/src/**/run/
-**/src/generated/**/.cache/
-repo/
-!**/src/**/repo/
+runs/
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+/build/
+/.gradle-compat-1.21.1/
