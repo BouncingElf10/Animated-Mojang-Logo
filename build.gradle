@@ -59,7 +59,7 @@ fabricCompat {
 
 publishMods {
     file = tasks.remapJar.archiveFile
-    changelog = "Updated TimelessLib dependency to ${project.timelesslib_version}"
+    changelog = "Merged #29 (tizianoluziramos) to preload all frames before playing the animation making it easier to play on lower end hardware."
     type = STABLE
     modLoaders.add("fabric")
 
