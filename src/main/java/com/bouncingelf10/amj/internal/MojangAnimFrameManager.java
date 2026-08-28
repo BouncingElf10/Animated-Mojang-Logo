@@ -15,8 +15,7 @@ import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
 public class MojangAnimFrameManager {
-    public static final AnimationTimeline timeline = TimelessLibClient.animations()
-            .createTimeline(Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "mojang_logo"));
+    public static final AnimationTimeline timeline = TimelessLibClient.animations().createTimeline(Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "mojang_logo"));
     public static boolean hasStarted = false;
     public static boolean hasFinished = false;
     public static boolean framesPreloaded = false;
@@ -36,22 +35,18 @@ public class MojangAnimFrameManager {
     public static final int STUDIOS_IMAGE_HEIGHT = 90 * 4;
 
     public static void tickPreload() {
-        if (framesPreloaded)
-            return;
+        if (framesPreloaded) return;
 
         Minecraft minecraft = Minecraft.getInstance();
 
         int framesPerTick = 3;
-
         for (int i = 0; i < framesPerTick && preloadIndex < FRAMES; i++) {
             Identifier id = Identifier.fromNamespaceAndPath(
                     AnimatedMojangLogoClient.MOD_ID,
-                    "textures/gui/frames/frame_" +
-                            String.format("%04d", preloadIndex + 1) +
-                            ".png");
+                    "textures/gui/frames/frame_" + String.format("%04d", preloadIndex + 1) + ".png"
+            );
 
             minecraft.getTextureManager().getTexture(id);
-
             preloadIndex++;
         }
 
@@ -60,7 +55,8 @@ public class MojangAnimFrameManager {
 
             AnimatedMojangLogoClient.LOGGER.info(
                     "All {} Mojang logo frames have been preloaded",
-                    FRAMES);
+                    FRAMES
+            );
         }
     }
 
@@ -72,8 +68,7 @@ public class MojangAnimFrameManager {
         if (hasStarted) return;
 
         if (!framesPreloaded) {
-            AnimatedMojangLogoClient.LOGGER.warn(
-                    "Tried to start Mojang animation before frames were preloaded");
+            AnimatedMojangLogoClient.LOGGER.warn("Tried to start Mojang animation before frames were preloaded");
             return;
         }
 
@@ -105,7 +100,8 @@ public class MojangAnimFrameManager {
 
         AnimatedMojangLogoClient.LOGGER.info("Playing sound and starting Mojang logo animation");
         Minecraft.getInstance().getSoundManager().play(
-                SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f));
+                SimpleSoundInstance.forUI(ModSounds.STARTUP, 1.0f)
+        );
     }
 
     public static void render(GuiGraphicsExtractor guiGraphics) {
@@ -126,14 +122,11 @@ public class MojangAnimFrameManager {
         int studiosX = guiGraphics.guiWidth() / 2 - studiosWidth / 2;
         int studiosY = logoY + logoHeight - 25;
 
-        Identifier frameLocation = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID,
-                "textures/gui/studios.png");
+        Identifier frameLocation = Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "textures/gui/studios.png");
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getStudios());
-        int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f),
-                Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth,
-                studiosHeight, studiosWidth, studiosHeight, tint);
+        int tint = ARGB.color(Math.round(opacityStudios * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, studiosX, studiosY, 0, 0, studiosWidth, studiosHeight, studiosWidth, studiosHeight, tint);
     }
 
     public static void renderLogo(GuiGraphicsExtractor guiGraphics) {
@@ -149,15 +142,12 @@ public class MojangAnimFrameManager {
                 "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
 
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
-        int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f),
-                Math.round(color.z * 255f));
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight,
-                renderWidth, renderHeight, tint);
+        int tint = ARGB.color(Math.round(opacityLogo * 255f), Math.round(color.x * 255f), Math.round(color.y * 255f), Math.round(color.z * 255f));
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, frameLocation, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight, tint);
     }
 
     public static void stop() {
-        if (!hasStarted)
-            return;
+        if (!hasStarted) return;
 
         timeline.stop();
 
