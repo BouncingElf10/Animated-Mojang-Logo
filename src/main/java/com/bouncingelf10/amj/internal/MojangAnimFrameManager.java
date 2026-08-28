@@ -19,9 +19,11 @@ public class MojangAnimFrameManager {
     public static final AnimationTimeline timeline = TimelessLibClient.animations().createTimeline(new ResourceLocation(AnimatedMojangLogoClient.MOD_ID, "mojang_logo"));
     public static boolean hasStarted = false;
     public static boolean hasFinished = false;
+    public static boolean framesPreloaded = false;
     public static float opacityLogo = 0;
     public static float opacityStudios = 0;
     public static int frame = 0;
+    public static int preloadIndex = 0;
 
     public static final float FADE_IN = 0.3f;
 
@@ -33,7 +35,44 @@ public class MojangAnimFrameManager {
     public static final int STUDIOS_IMAGE_WIDTH = 560 * 4;
     public static final int STUDIOS_IMAGE_HEIGHT = 90 * 4;
 
+    public static void tickPreload() {
+        if (framesPreloaded) return;
+
+        Minecraft minecraft = Minecraft.getInstance();
+
+        int framesPerTick = 3;
+        for (int i = 0; i < framesPerTick && preloadIndex < FRAMES; i++) {
+            ResourceLocation id = new ResourceLocation(
+                AnimatedMojangLogoClient.MOD_ID,
+                "textures/gui/frames/frame_" + String.format("%04d", preloadIndex + 1) + ".png"
+            );
+
+            minecraft.getTextureManager().getTexture(id);
+            preloadIndex++;
+        }
+
+        if (preloadIndex >= FRAMES) {
+            framesPreloaded = true;
+
+            AnimatedMojangLogoClient.LOGGER.info(
+                "All {} Mojang logo frames have been preloaded",
+                FRAMES
+            );
+        }
+    }
+
+    public static boolean areFramesPreloaded() {
+        return framesPreloaded;
+    }
+
     public static void start() {
+        if (hasStarted) return;
+
+        if (!framesPreloaded) {
+            AnimatedMojangLogoClient.LOGGER.warn("Tried to start Mojang animation before frames were preloaded");
+            return;
+        }
+
         hasStarted = true;
         float animDuration = (float) (FRAMES / FPS); // seconds
 
