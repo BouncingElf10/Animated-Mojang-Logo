@@ -1,0 +1,23 @@
+{
+  "modmenu.nameTranslation.animated-mojang-logo": "애니메이션 Mojang 로고",
+  "modmenu.descriptionTranslation.animated-mojang-logo": "기본 Minecraft 로딩 화면을 Minecraft Dungeons / Minecraft Live의 Mojang Studios 애니메이션 인트로(징글 포함)로 교체합니다.",
+  "config.animated-mojang-logo.title": "애니메이션 Mojang 로고",
+  "config.animated-mojang-logo.category.general": "일반",
+  "config.animated-mojang-logo.category.colors": "색상",
+  "config.animated-mojang-logo.enabled": "활성화",
+  "config.animated-mojang-logo.enabled.desc": "모드를 활성화하거나 비활성화합니다.",
+  "config.animated-mojang-logo.override_colors": "색상 재정의",
+  "config.animated-mojang-logo.override_colors.desc": "기본 색상 대신 사용자 지정 색상을 사용합니다.",
+  "config.animated-mojang-logo.only_play_once": "한 번만 재생",
+  "config.animated-mojang-logo.only_play_once.desc": "활성화되면 게임 시작 시 애니메이션이 한 번만 재생됩니다.",
+  "config.animated-mojang-logo.hold_seconds": "표시 시간(초)",
+  "config.animated-mojang-logo.hold_seconds.desc": "메인 메뉴로 전환되기 전에 로고가 화면에 표시되는 시간.",
+  "config.animated-mojang-logo.background": "배경",
+  "config.animated-mojang-logo.bar": "진행 바",
+  "config.animated-mojang-logo.bar_background": "바 배경",
+  "config.animated-mojang-logo.bar_border": "바 테두리",
+  "config.animated-mojang-logo.logo": "로고",
+  "config.animated-mojang-logo.logo.desc": "\"MOJANG\" 텍스트의 색상.",
+  "config.animated-mojang-logo.studios": "Studios",
+  "config.animated-mojang-logo.studios.desc": "\"STUDIOS\" 텍스트의 색상."
+}

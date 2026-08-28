@@ -1,0 +1,23 @@
+{
+  "modmenu.nameTranslation.animated-mojang-logo": "アニメーションMojangロゴ",
+  "modmenu.descriptionTranslation.animated-mojang-logo": "デフォルトのMinecraftロード画面を、Minecraft Dungeons / Minecraft LiveのMojang Studiosアニメーションイントロ（ジングル付き）に置き換えます。",
+  "config.animated-mojang-logo.title": "アニメーションMojangロゴ",
+  "config.animated-mojang-logo.category.general": "一般",
+  "config.animated-mojang-logo.category.colors": "カラー",
+  "config.animated-mojang-logo.enabled": "有効",
+  "config.animated-mojang-logo.enabled.desc": "Modを有効または無効にします。",
+  "config.animated-mojang-logo.override_colors": "カラーを上書き",
+  "config.animated-mojang-logo.override_colors.desc": "デフォルトの色の代わりにカスタムカラーを使用します。",
+  "config.animated-mojang-logo.only_play_once": "一度だけ再生",
+  "config.animated-mojang-logo.only_play_once.desc": "有効にすると、アニメーションはゲーム起動時に一度だけ再生されます。",
+  "config.animated-mojang-logo.hold_seconds": "表示秒数",
+  "config.animated-mojang-logo.hold_seconds.desc": "メインメニューに移行するまでロゴが画面に表示される時間。",
+  "config.animated-mojang-logo.background": "背景",
+  "config.animated-mojang-logo.bar": "プログレスバー",
+  "config.animated-mojang-logo.bar_background": "バー背景",
+  "config.animated-mojang-logo.bar_border": "バー枠",
+  "config.animated-mojang-logo.logo": "ロゴ",
+  "config.animated-mojang-logo.logo.desc": "\"MOJANG\"テキストの色。",
+  "config.animated-mojang-logo.studios": "Studios",
+  "config.animated-mojang-logo.studios.desc": "\"STUDIOS\"テキストの色。"
+}

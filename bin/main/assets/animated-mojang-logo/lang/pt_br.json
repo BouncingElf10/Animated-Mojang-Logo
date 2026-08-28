@@ -1,0 +1,23 @@
+{
+  "modmenu.nameTranslation.animated-mojang-logo": "Logo Mojang Animado",
+  "modmenu.descriptionTranslation.animated-mojang-logo": "Substitui a tela de carregamento padrão do Minecraft pela intro animada do Mojang Studios de Minecraft Dungeons / Minecraft Live, incluindo o jingle.",
+  "config.animated-mojang-logo.title": "Logo Mojang Animado",
+  "config.animated-mojang-logo.category.general": "Geral",
+  "config.animated-mojang-logo.category.colors": "Cores",
+  "config.animated-mojang-logo.enabled": "Ativado",
+  "config.animated-mojang-logo.enabled.desc": "Ativa ou desativa o mod.",
+  "config.animated-mojang-logo.override_colors": "Substituir Cores",
+  "config.animated-mojang-logo.override_colors.desc": "Usar cores personalizadas em vez das padrão.",
+  "config.animated-mojang-logo.only_play_once": "Reproduzir Apenas Uma Vez",
+  "config.animated-mojang-logo.only_play_once.desc": "Se ativado, a animação será reproduzida apenas uma vez ao iniciar o jogo.",
+  "config.animated-mojang-logo.hold_seconds": "Segundos de Exibição",
+  "config.animated-mojang-logo.hold_seconds.desc": "Por quanto tempo o logo permanece na tela antes de ir para o menu principal.",
+  "config.animated-mojang-logo.background": "Fundo",
+  "config.animated-mojang-logo.bar": "Barra de Progresso",
+  "config.animated-mojang-logo.bar_background": "Fundo da Barra",
+  "config.animated-mojang-logo.bar_border": "Borda da Barra",
+  "config.animated-mojang-logo.logo": "Logo",
+  "config.animated-mojang-logo.logo.desc": "A cor do texto \"MOJANG\".",
+  "config.animated-mojang-logo.studios": "Studios",
+  "config.animated-mojang-logo.studios.desc": "A cor do texto \"STUDIOS\"."
+}

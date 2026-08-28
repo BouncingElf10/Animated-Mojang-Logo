@@ -17,9 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class LoadingOverlayMixin {
 
 	@Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
-	private void onExtractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-		if (!ModConfig.isEnabled()) return;
-		if (AnimatedMojangLogoClient.hasRunOnce && ModConfig.shouldOnlyPlayOnce()) return;
+	private void onExtractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta,
+			CallbackInfo ci) {
+		if (!ModConfig.isEnabled())
+			return;
+		if (AnimatedMojangLogoClient.hasRunOnce && ModConfig.shouldOnlyPlayOnce())
+			return;
 		ci.cancel();
 
 		LoadingOverlayAccessor self = (LoadingOverlayAccessor) this;
@@ -56,7 +59,9 @@ public class LoadingOverlayMixin {
 		graphics.fill(0, 0, graphics.guiWidth(), graphics.guiHeight(), ColorManager.getBackground());
 		renderProgressBar(graphics, self, fadeOut);
 
-		if (AnimatedMojangLogoClient.isInit && self.getReload().isDone()) {
+		if (AnimatedMojangLogoClient.isInit
+				&& self.getReload().isDone()
+				&& MojangAnimFrameManager.areFramesPreloaded()) {
 			renderMojangAnim(graphics);
 		}
 	}
@@ -82,12 +87,12 @@ public class LoadingOverlayMixin {
 
 	@Unique
 	private float getFadeOutProgress(LoadingOverlayAccessor self, long now) {
-		return self.getFadeOutStart() > -1L ? (float)(now - self.getFadeOutStart()) / 1000.0F : -1.0F;
+		return self.getFadeOutStart() > -1L ? (float) (now - self.getFadeOutStart()) / 1000.0F : -1.0F;
 	}
 
 	@Unique
 	private float getFadeInProgress(LoadingOverlayAccessor self, long now) {
-		return self.getFadeInStart() > -1L ? (float)(now - self.getFadeInStart()) / 500.0F : -1.0F;
+		return self.getFadeInStart() > -1L ? (float) (now - self.getFadeInStart()) / 500.0F : -1.0F;
 	}
 
 	@Unique
@@ -98,24 +103,25 @@ public class LoadingOverlayMixin {
 
 	@Unique
 	private void renderProgressBar(GuiGraphicsExtractor graphics, LoadingOverlayAccessor self, float fadeOut) {
-		if (fadeOut >= 1.0F) return;
+		if (fadeOut >= 1.0F)
+			return;
 
 		int w = graphics.guiWidth();
 		int h = graphics.guiHeight();
 		int centerX = w / 2;
-		int barHalfWidth = (int)(Math.min(w * 0.75, h) * 0.25 * 4.0 * 0.5);
-		int barY = (int)(h * 0.8325);
+		int barHalfWidth = (int) (Math.min(w * 0.75, h) * 0.25 * 4.0 * 0.5);
+		int barY = (int) (h * 0.8325);
 		float alpha = 1.0F - Mth.clamp(fadeOut, 0.0F, 1.0F);
 
 		drawProgressBar(graphics,
 				centerX - barHalfWidth, barY - 5,
 				centerX + barHalfWidth, barY + 5,
-				alpha, self.getCurrentProgress()
-		);
+				alpha, self.getCurrentProgress());
 	}
 
 	@Unique
-	private void drawProgressBar(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, float alpha, float progress) {
+	private void drawProgressBar(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, float alpha,
+			float progress) {
 		int width = x2 - x1;
 		int filled = Math.min(Mth.ceil((width - 2) * progress), width - 4);
 		int barColor = ColorManager.applyAlpha(ColorManager.getBar(), alpha);
@@ -137,6 +143,7 @@ public class LoadingOverlayMixin {
 
 	@Unique
 	private boolean canFinish(LoadingOverlayAccessor self, float fadeIn) {
-		return self.getFadeOutStart() == -1L && self.getReload().isDone() && MojangAnimFrameManager.hasFinished && (!self.getFadeIn() || fadeIn >= 2.0F);
+		return self.getFadeOutStart() == -1L && self.getReload().isDone() && MojangAnimFrameManager.hasFinished
+				&& (!self.getFadeIn() || fadeIn >= 2.0F);
 	}
 }
