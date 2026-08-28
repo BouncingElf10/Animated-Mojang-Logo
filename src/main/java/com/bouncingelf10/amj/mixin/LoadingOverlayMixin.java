@@ -29,6 +29,7 @@ public class LoadingOverlayMixin {
 
 		tickFadeIn(self, now);
 		smoothProgress(self);
+		MojangAnimFrameManager.tickPreload();
 
 		float fadeOut = getFadeOutProgress(self, now);
 		float fadeIn = getFadeInProgress(self, now);
@@ -36,7 +37,7 @@ public class LoadingOverlayMixin {
 		guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ColorManager.getBackground());
 		renderProgressBar(guiGraphics, self, fadeOut);
 
-		if (fadeOut >= 2.0F && AnimatedMojangLogoClient.isInit) {
+		if (fadeOut >= 2.0F && AnimatedMojangLogoClient.isInit && MojangAnimFrameManager.areFramesPreloaded()) {
 			renderMojangAnim(guiGraphics);
 			if (MojangAnimFrameManager.hasFinished) removeOverlay(self);
 		}
