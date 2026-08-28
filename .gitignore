@@ -119,19 +119,4 @@ runs/
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 /build/
-/.gradle-compat-1.21.1/noVersion/buildLogic.lock
-/.gradle-compat-1.21.1/buildOutputCleanup/buildOutputCleanup.lock
-/.gradle-compat-1.21.1/buildOutputCleanup/cache.properties
-/.gradle-compat-1.21.1/9.3.0/checksums/checksums.lock
-/.gradle-compat-1.21.1/9.3.0/executionHistory/executionHistory.bin
-/.gradle-compat-1.21.1/9.3.0/executionHistory/executionHistory.lock
-/.gradle-compat-1.21.1/9.3.0/expanded/expanded.lock
-/.gradle-compat-1.21.1/9.3.0/fileHashes/fileHashes.bin
-/.gradle-compat-1.21.1/9.3.0/fileHashes/fileHashes.lock
-/.gradle-compat-1.21.1/9.3.0/gc.properties
-/.gradle-compat-1.21.1/vcs-1/gc.properties
-/.gradle-compat-1.21.1/9.3.0/fileChanges/last-build.bin
-/.gradle-compat-1.21.1/9.3.0/checksums/md5-checksums.bin
-/.gradle-compat-1.21.1/buildOutputCleanup/outputFiles.bin
-/.gradle-compat-1.21.1/9.3.0/fileHashes/resourceHashesCache.bin
-/.gradle-compat-1.21.1/9.3.0/checksums/sha1-checksums.bin
+/.gradle-compat-1.21.1/
