@@ -159,7 +159,7 @@ dependencies {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Ported to 1.21.10, with the fade-in animation feature backported from Fabric"
+    changelog = "Merged #29 (tizianoluziramos) to preload all frames before playing the animation making it easier to play on lower end hardware."
     type = STABLE
     modLoaders.add("neoforge")
 
