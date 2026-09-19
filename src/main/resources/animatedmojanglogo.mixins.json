@@ -11,6 +11,7 @@
   "client": [
     "NeoForgeLoadingOverlayAccessor",
     "NeoForgeLoadingOverlayMixin",
+    "MusicManagerMixin",
     "TimelessMixin"
   ]
 }
