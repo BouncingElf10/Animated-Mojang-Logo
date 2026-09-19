@@ -40,7 +40,7 @@ minecraftCompat {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Updated to 26.3"
+    changelog = "Fixed issue where music would start in the middle of the animation. (#30)"
     type = STABLE
     modLoaders.add("fabric")
 
