@@ -152,7 +152,7 @@ dependencies {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Neoforge port"
+    changelog = "Fixed issue where music would start in the middle of the animation. (#30)"
     type = STABLE
     modLoaders.add("neoforge")
 
@@ -168,6 +168,8 @@ publishMods {
     curseforge {
         projectId = "1253070"
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        clientRequired = true
+        serverRequired = false
         requires("yacl")
 
         minecraftVersions.add("1.21")

@@ -32,19 +32,17 @@ public class NeoForgeLoadingOverlayMixin {
         NeoForgeLoadingOverlayAccessor self = (NeoForgeLoadingOverlayAccessor) this;
         long now = Util.getMillis();
 
+        smoothProgress(self);
+        MojangAnimFrameManager.tickPreload();
+
         float fadeOut = getFadeOutProgress(self, now);
 
-        smoothProgress(self);
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ColorManager.getBackground());
         renderProgressBar(guiGraphics, self, fadeOut);
 
-
-        if (fadeOut >= 1.0F && AnimatedMojangLogoClient.isInit) {
+        if (fadeOut >= 1.0F && AnimatedMojangLogoClient.isInit && MojangAnimFrameManager.areFramesPreloaded()) {
             renderMojangAnim(guiGraphics);
-
-            if (MojangAnimFrameManager.hasFinished) {
-                removeOverlay(self);
-            }
+            if (MojangAnimFrameManager.hasFinished) removeOverlay(self);
         }
 
         if (self.getFadeOutStart() == -1L && self.getReload().isDone()) {
