@@ -62,7 +62,7 @@ fabricCompat {
 
 publishMods {
     file = tasks.remapJar.archiveFile
-    changelog = "Fixed issue where music would start in the middle of the animation. (#30)"
+    changelog = "Fixed bug where F3+T would freeze game with \"play once\" setting off (#31)"
     type = STABLE
     modLoaders.add("fabric")
 
