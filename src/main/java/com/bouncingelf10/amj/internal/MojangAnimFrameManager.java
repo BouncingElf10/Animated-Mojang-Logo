@@ -5,6 +5,7 @@ import com.bouncingelf10.amj.config.ModConfig;
 import com.bouncingelf10.amj.sound.ModSounds;
 import dev.bouncingelf10.timelesslib.TimelessLibClient;
 import dev.bouncingelf10.timelesslib.api.animation.AnimationTimeline;
+import dev.bouncingelf10.timelesslib.api.clock.TimeSources;
 import dev.bouncingelf10.timelesslib.api.time.Duration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -15,7 +16,8 @@ import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
 public class MojangAnimFrameManager {
-    public static final AnimationTimeline timeline = TimelessLibClient.animations().createTimeline(Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "mojang_logo"));
+    public static final AnimationTimeline timeline = TimelessLibClient.animations().createTimeline(Identifier.fromNamespaceAndPath(AnimatedMojangLogoClient.MOD_ID, "mojang_logo"))
+            .setTimeSource(TimeSources.REAL_TIME);
     public static boolean hasStarted = false;
     public static boolean hasFinished = false;
     public static boolean framesPreloaded = false;
