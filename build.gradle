@@ -152,7 +152,7 @@ dependencies {
 
 publishMods {
     file = tasks.jar.archiveFile
-    changelog = "Fixed bug where F3+T would freeze game with \"play once\" setting off (#31)"
+    changelog = "Reduced image size to decrease jar size by 82%"
     type = STABLE
     modLoaders.add("neoforge")
 
