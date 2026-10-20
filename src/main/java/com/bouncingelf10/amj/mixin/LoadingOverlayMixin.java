@@ -17,26 +17,32 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 @Mixin(LoadingOverlay.class)
 public class LoadingOverlayMixin {
+
+	@Unique
+	private long reloadDoneStart = -1L;
 
 	@Inject(method = "render", at = @At("HEAD"), cancellable = true)
 	private void onRender(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
 		if (!ModConfig.isEnabled()) return;
 		if (AnimatedMojangLogoClient.hasRunOnce && ModConfig.shouldOnlyPlayOnce()) return;
-		ci.cancel();
 
 		LoadingOverlayAccessor self = (LoadingOverlayAccessor) this;
 		long now = Util.getMillis();
 
 		tickFadeIn(self, now);
+		float fadeIn = getFadeInProgress(self, now);
+
+		if (MojangAnimFrameManager.hasFinished && canFinish(self, fadeIn)) return;
+
+		ci.cancel();
+
 		smoothProgress(self);
 		MojangAnimFrameManager.tickPreload();
 
-		float fadeOut = getFadeOutProgress(self, now);
-		float fadeIn = getFadeInProgress(self, now);
+		if (reloadDoneStart == -1L && self.getReload().isDone()) reloadDoneStart = now;
+		float fadeOut = getFadeOutProgress(now);
 
 		int w = self.getMinecraft().getWindow().getGuiScaledWidth();
 		int h = self.getMinecraft().getWindow().getGuiScaledHeight();
@@ -46,12 +52,20 @@ public class LoadingOverlayMixin {
 
 		if (fadeOut >= 2.0F && AnimatedMojangLogoClient.isInit && MojangAnimFrameManager.areFramesPreloaded()) {
 			renderMojangAnim(poseStack, w, h);
-			if (MojangAnimFrameManager.hasFinished) removeOverlay(self);
 		}
+	}
 
-		if (canFinish(self, fadeIn)) {
-			finish(self, poseStack, now, w, h);
-		}
+	@Inject(method = "render", at = @At("TAIL"))
+	private void afterRender(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
+		if (!MojangAnimFrameManager.hasFinished) return;
+
+		LoadingOverlayAccessor self = (LoadingOverlayAccessor) this;
+		int w = self.getMinecraft().getWindow().getGuiScaledWidth();
+		int h = self.getMinecraft().getWindow().getGuiScaledHeight();
+
+		GuiComponent.fill(poseStack, 0, 0, w, h, ColorManager.getBackground());
+		MojangAnimFrameManager.render(poseStack, w, h);
+		removeOverlay(self);
 	}
 
 	@Unique
@@ -92,8 +106,8 @@ public class LoadingOverlayMixin {
 	}
 
 	@Unique
-	private float getFadeOutProgress(LoadingOverlayAccessor self, long now) {
-		return self.getFadeOutStart() > -1L ? (float)(now - self.getFadeOutStart()) / 1000.0F : -1.0F;
+	private float getFadeOutProgress(long now) {
+		return reloadDoneStart > -1L ? (float)(now - reloadDoneStart) / 1000.0F : -1.0F;
 	}
 
 	@Unique
@@ -147,20 +161,5 @@ public class LoadingOverlayMixin {
 	@Unique
 	private boolean canFinish(LoadingOverlayAccessor self, float fadeIn) {
 		return self.getFadeOutStart() == -1L && self.getReload().isDone() && (!self.getFadeIn() || fadeIn >= 2.0F);
-	}
-
-	@Unique
-	private void finish(LoadingOverlayAccessor self, PoseStack poseStack, long now, int w, int h) {
-		try {
-			self.getReload().checkExceptions();
-			self.getOnFinish().accept(Optional.empty());
-		} catch (Throwable t) {
-			self.getOnFinish().accept(Optional.of(t));
-		}
-
-		self.setFadeOutStart(now);
-
-		if (self.getMinecraft().screen != null)
-			self.getMinecraft().screen.init(self.getMinecraft(), w, h);
 	}
 }
