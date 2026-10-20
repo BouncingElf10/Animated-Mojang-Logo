@@ -9,6 +9,8 @@
     "requireAnnotations": true
   },
   "client": [
+    "LoadingOverlayAccessor",
+    "LoadingOverlayMixin",
     "NeoForgeLoadingOverlayAccessor",
     "NeoForgeLoadingOverlayMixin",
     "MusicManagerMixin",
