@@ -43,12 +43,7 @@ public class MojangAnimFrameManager {
 
         int framesPerTick = 3;
         for (int i = 0; i < framesPerTick && preloadIndex < FRAMES; i++) {
-            ResourceLocation id = new ResourceLocation(
-                AnimatedMojangLogoClient.MOD_ID,
-                "textures/gui/frames/frame_" + String.format("%04d", preloadIndex + 1) + ".png"
-            );
-
-            minecraft.getTextureManager().getTexture(id);
+            minecraft.getTextureManager().getTexture(frameLocation(preloadIndex));
             preloadIndex++;
         }
 
@@ -66,6 +61,13 @@ public class MojangAnimFrameManager {
         return framesPreloaded;
     }
 
+    private static ResourceLocation frameLocation(int index) {
+        return new ResourceLocation(
+            AnimatedMojangLogoClient.MOD_ID,
+            "textures/gui/frames/frame_" + String.format("%04d", index + 1) + ".png"
+        );
+    }
+
     public static void start() {
         if (hasStarted) return;
 
@@ -75,7 +77,7 @@ public class MojangAnimFrameManager {
         }
 
         hasStarted = true;
-        float animDuration = (float)(FRAMES / FPS);
+        float animDuration = (float) FRAMES / FPS;
 
         timeline.channelDouble("opacity_logo")
                 .keyframe(0, 0)
@@ -145,14 +147,11 @@ public class MojangAnimFrameManager {
         int x = w / 2 - renderWidth / 2;
         int y = (h - 28) / 2 - renderHeight / 2;
 
-        ResourceLocation frameLocation = new ResourceLocation(AnimatedMojangLogoClient.MOD_ID,
-                "textures/gui/frames/frame_" + String.format("%04d", frame + 1) + ".png");
-
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         Vector3f color = ColorManager.getColorVec(ColorManager.getLogo());
         RenderSystem.setShaderColor(color.x(), color.y(), color.z(), opacityLogo);
-        RenderSystem.setShaderTexture(0, frameLocation);
+        RenderSystem.setShaderTexture(0, frameLocation(frame));
         GuiComponent.blit(poseStack, x, y, 0, 0, renderWidth, renderHeight, renderWidth, renderHeight);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableBlend();
@@ -169,5 +168,13 @@ public class MojangAnimFrameManager {
         opacityStudios = 0;
         frame = 0;
         AnimatedMojangLogoClient.hasRunOnce = true;
+
+        Minecraft.getInstance().execute(() -> {
+            for (int i = 0; i < FRAMES; i++) {
+                Minecraft.getInstance().getTextureManager().release(frameLocation(i));
+            }
+            framesPreloaded = false;
+            preloadIndex = 0;
+        });
     }
 }
