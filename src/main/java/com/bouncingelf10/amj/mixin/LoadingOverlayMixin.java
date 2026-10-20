@@ -7,13 +7,12 @@ import com.bouncingelf10.amj.internal.MojangAnimFrameManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Optional;
 
 @Mixin(LoadingOverlay.class)
 public class LoadingOverlayMixin {
@@ -25,14 +24,13 @@ public class LoadingOverlayMixin {
 		ci.cancel();
 
 		LoadingOverlayAccessor self = (LoadingOverlayAccessor) this;
-		long now = System.currentTimeMillis();
+		long now = Util.getMillis();
 
 		tickFadeIn(self, now);
 		smoothProgress(self);
 		MojangAnimFrameManager.tickPreload();
 
 		float fadeOut = getFadeOutProgress(self, now);
-		float fadeIn = getFadeInProgress(self, now);
 
 		guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ColorManager.getBackground());
 		renderProgressBar(guiGraphics, self, fadeOut);
@@ -40,10 +38,6 @@ public class LoadingOverlayMixin {
 		if (fadeOut >= 2.0F && AnimatedMojangLogoClient.isInit && MojangAnimFrameManager.areFramesPreloaded()) {
 			renderMojangAnim(guiGraphics);
 			if (MojangAnimFrameManager.hasFinished) removeOverlay(self);
-		}
-
-		if (canFinish(self, fadeIn)) {
-			finish(self, guiGraphics, now);
 		}
 	}
 
@@ -65,11 +59,6 @@ public class LoadingOverlayMixin {
 	@Unique
     private float getFadeOutProgress(LoadingOverlayAccessor self, long now) {
 		return self.getFadeOutStart() > -1L ? (float)(now - self.getFadeOutStart()) / 1000.0F : -1.0F;
-	}
-
-	@Unique
-	private float getFadeInProgress(LoadingOverlayAccessor self, long now) {
-		return self.getFadeInStart() > -1L ? (float)(now - self.getFadeInStart()) / 500.0F : -1.0F;
 	}
 
 	@Unique
@@ -115,25 +104,5 @@ public class LoadingOverlayMixin {
 	@Unique
 	private void removeOverlay(LoadingOverlayAccessor self) {
 		self.getMinecraft().setOverlay(null);
-	}
-
-	@Unique
-	private boolean canFinish(LoadingOverlayAccessor self, float fadeIn) {
-		return self.getFadeOutStart() == -1L && self.getReload().isDone() && (!self.getFadeIn() || fadeIn >= 2.0F);
-	}
-
-	@Unique
-	private void finish(LoadingOverlayAccessor self, GuiGraphics guiGraphics, long now) {
-		try {
-			self.getReload().checkExceptions();
-			self.getOnFinish().accept(Optional.empty());
-		} catch (Throwable t) {
-			self.getOnFinish().accept(Optional.of(t));
-		}
-
-		self.setFadeOutStart(now);
-
-		if (self.getMinecraft().screen != null)
-			self.getMinecraft().screen.init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
 	}
 }
