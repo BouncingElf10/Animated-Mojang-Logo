@@ -6,7 +6,9 @@ import com.bouncingelf10.amj.internal.ColorManager;
 import com.bouncingelf10.amj.internal.MojangAnimFrameManager;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 
 import net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay;
 
@@ -16,9 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
-@Mixin(NeoForgeLoadingOverlay.class)
+@Mixin({LoadingOverlay.class, NeoForgeLoadingOverlay.class})
 public class NeoForgeLoadingOverlayMixin {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -29,14 +29,13 @@ public class NeoForgeLoadingOverlayMixin {
         ci.cancel();
 
         NeoForgeLoadingOverlayAccessor self = (NeoForgeLoadingOverlayAccessor) this;
-        long now = System.currentTimeMillis();
+        long now = Util.getMillis();
 
         tickFadeIn(self, now);
         smoothProgress(self);
         MojangAnimFrameManager.tickPreload();
 
         float fadeOut = getFadeOutProgress(self, now);
-        float fadeIn = getFadeInProgress(self, now);
 
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ColorManager.getBackground());
         renderProgressBar(guiGraphics, self, fadeOut);
@@ -44,10 +43,6 @@ public class NeoForgeLoadingOverlayMixin {
         if (fadeOut >= 2.0F && AnimatedMojangLogoClient.isInit && MojangAnimFrameManager.areFramesPreloaded()) {
             renderMojangAnim(guiGraphics);
             if (MojangAnimFrameManager.hasFinished) removeOverlay(self);
-        }
-
-        if (canFinish(self, fadeIn)) {
-            finish(self, guiGraphics, now);
         }
     }
 
@@ -79,18 +74,6 @@ public class NeoForgeLoadingOverlayMixin {
         return self.getFadeOutStart() > -1L
                 ? (float) (now - self.getFadeOutStart()) / 1000.0F
                 : -1.0F;
-    }
-
-    @Unique
-    private float getFadeInProgress(NeoForgeLoadingOverlayAccessor self, long now) {
-        return self.getFadeInStart() > -1L
-                ? (float) (now - self.getFadeInStart()) / 500.0F
-                : -1.0F;
-    }
-
-    @Unique
-    private boolean canFinish(NeoForgeLoadingOverlayAccessor self, float fadeIn) {
-        return self.getFadeOutStart() == -1L && self.getReload().isDone() && (!self.getFadeIn() || fadeIn >= 2.0F);
     }
 
     @Unique
@@ -132,20 +115,5 @@ public class NeoForgeLoadingOverlayMixin {
     @Unique
     private void removeOverlay(NeoForgeLoadingOverlayAccessor self) {
         self.getMinecraft().setOverlay(null);
-    }
-
-    @Unique
-    private void finish(NeoForgeLoadingOverlayAccessor self, GuiGraphics guiGraphics, long now) {
-        try {
-            self.getReload().checkExceptions();
-            self.getOnFinish().accept(Optional.empty());
-        } catch (Throwable t) {
-            self.getOnFinish().accept(Optional.of(t));
-        }
-
-        self.setFadeOutStart(now);
-
-        if (self.getMinecraft().screen != null)
-            self.getMinecraft().screen.init(guiGraphics.guiWidth(), guiGraphics.guiHeight());
     }
 }
